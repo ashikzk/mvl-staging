@@ -43,10 +43,10 @@ locale.getlocale=getlocale
 from datetime import datetime
 
 
-_MVL = Addon('plugin.video.mvl.staging', sys.argv)
+_MVL = Addon('plugin.video.mvl', sys.argv)
 plugin = Plugin()
 pluginhandle = int(sys.argv[1])
-usrsettings = xbmcaddon.Addon(id='plugin.video.mvl.staging')
+usrsettings = xbmcaddon.Addon(id='plugin.video.mvl')
 page_limit = usrsettings.getSetting('page_limit_xbmc')
 authentication = plugin.get_storage('authentication', TTL=1)
 authentication['logged_in'] = 'false'
@@ -90,6 +90,26 @@ isAgree = False
 @plugin.route('/')
 def index():
     global Main_cat
+
+#############
+
+    video_popup = xbmcgui.WindowXMLDialog('Custom-VideoPopUp.xml', os.path.dirname(os.path.realpath(__file__)))
+    video_popup.doModal()
+
+    print video_popup.getControl(9123)
+    #print dir(li)
+    #print video_popup.removeItem(0)
+    #print 'OKEY-DOKEY'
+
+    del video_popup
+
+    #xbmc.executebuiltin('ActivateWindow(1234)')
+    hide_busy_dialog()
+    exit()
+
+
+
+    #################
     
     file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'quit_log.dat')
     f = open(file_path, 'w')
@@ -144,7 +164,7 @@ def index():
             file.write('<showparentdiritems>false</showparentdiritems>\n')
             file.write('</filelists>\n')
             file.write('<lookandfeel>\n')
-            file.write('<skin>skin.mvl.staging</skin>\n')
+            file.write('<skin>skin.mvl</skin>\n')
             file.write('</lookandfeel>\n')
             file.write('</advancedsettings>\n')
             file.close()
@@ -161,7 +181,7 @@ def index():
             file.write("<F5>Skin.ToggleSetting('test')</F5>\n")
             file.write("<F6>Skin.ToggleSetting('test')</F6>\n")
             file.write("<backslash>Skin.ToggleSetting('test')</backslash>\n")
-            file.write("<backspace>XBMC.RunScript(special://home\\addons\plugin.video.mvl.staging\script_backhandler.py)</backspace>\n")
+            file.write("<backspace>XBMC.RunScript(special://home\\addons\plugin.video.mvl\script_backhandler.py)</backspace>\n")
             file.write('</keyboard>\n')
             file.write('</global>\n')
             file.write('</keymap>')
@@ -981,14 +1001,6 @@ def play_video(url, title):
     if check_internet():
         show_notification()
 
-        video_popup = xbmcgui.WindowXMLDialog('Custom-VideoPopUp.xml', os.path.dirname(os.path.realpath(__file__)))
-        video_popup.doModal()
-        del video_popup
-
-        #xbmc.executebuiltin('ActivateWindow(1234)')
-        hide_busy_dialog()
-        exit()
-
         mvl_view_mode = 50
         #if login is successful then selected item will be resolved using urlresolver and played
         if login_check():
@@ -1129,7 +1141,7 @@ def check_update():
         mvl_video_version = addon.attributes['version'].value
 
         #mvl skin
-        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'skin.mvl.staging', 'addon.xml')
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'skin.mvl', 'addon.xml')
         xmldoc = minidom.parse(file_path)
         addon = xmldoc.getElementsByTagName('addon')[0]
         mvl_skin_version = addon.attributes['version'].value
