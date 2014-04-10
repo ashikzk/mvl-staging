@@ -774,7 +774,7 @@ def get_categories(id, page):
                                           'year': categories['release_date']
                                       },
                                       'path': plugin.url_for('get_videos', id=categories['video_id'],
-                                                             thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta)),
+                                                             thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8')),
                                       'is_playable': False,
                                       'context_menu': [(
                                                            'Add to Favourites',
@@ -1407,7 +1407,7 @@ def search(category):
                                               'cast': categories['actors'].encode('utf-8'),
                                               'year': categories['release_date']
                                           },
-                                          'path': plugin.url_for('get_videos', id=categories['video_id'], thumbnail=thumbnail_url),
+                                          'path': plugin.url_for('get_videos', id=categories['video_id'], thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8')),
                                           'is_playable': False,
                                           'context_menu': [(
                                                                'Add to Favourites',
@@ -1694,7 +1694,7 @@ def get_azlist(key, page, category):
                                           'year': results['release_date']
                                       },
                                       'path': plugin.url_for('get_videos', id=results['video_id'],
-                                                             thumbnail=results['thumbnail']),
+                                                             thumbnail=results['thumbnail'], trailer=get_trailer_url(mvl_meta).encode('utf-8')),
                                       'is_playable': False,
                                       'context_menu': [(
                                                            'Add to Favourites',
@@ -1809,7 +1809,7 @@ def mostpopular(page, category):
                                   'properties': {
                                       'fanart_image': fanart_url,
                                   },
-                                  'path': plugin.url_for('get_videos', id=results['id'], thumbnail=thumbnail_url),
+                                  'path': plugin.url_for('get_videos', id=results['id'], thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8')),
                                   'is_playable': False,
                                   'context_menu': [(
                                                        'Add to Favourites',
