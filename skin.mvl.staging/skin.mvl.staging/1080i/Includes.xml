@@ -150,7 +150,7 @@
         <height>90</height>
         <texture border="100,0,0,0" flipy="true">common/TimePanel.png</texture>
       </control>
-      <control type="label">
+<!--       <control type="label">
         <visible>!Player.HasAudio</visible>
         <include>VisibleFadeEffect</include>
         <posx>30</posx>
@@ -160,6 +160,42 @@
         <font>Details</font>
         <label>$VAR[GlobalHeadings]</label>
       </control>
+ -->      
+ 
+ 	  <control type="label">
+		<!-- <visible>SubString(Container.FolderPath,categories/1)</visible> -->
+		<visible>!StringCompare(Skin.String(CurrentSection),Movies) + !StringCompare(Skin.String(CurrentSection),TV)</visible>
+        <include>VisibleFadeEffect</include>
+        <posx>30</posx>
+        <posy>0</posy>
+        <width>1200</width>
+        <height>35</height>
+        <font>Details</font>
+        <label>$VAR[GlobalHeadings]</label>
+      </control>
+
+	  <control type="label">
+		<visible>SubString(Container.FolderName,My) + StringCompare(Skin.String(CurrentSection),Movies)</visible>
+        <include>VisibleFadeEffect</include>
+        <posx>30</posx>
+        <posy>0</posy>
+        <width>1200</width>
+        <height>35</height>
+        <font>Details</font>
+        <label>$VAR[GlobalHeadings] - Movies</label>
+      </control>
+	  
+	  <control type="label">
+		<visible>SubString(Container.FolderName,My) + StringCompare(Skin.String(CurrentSection),TV)</visible>
+        <include>VisibleFadeEffect</include>
+        <posx>30</posx>
+        <posy>0</posy>
+        <width>1200</width>
+        <height>35</height>
+        <font>Details</font>
+        <label>$VAR[GlobalHeadings] - TV</label>
+      </control>
+	  
       <control type="group">
         <visible>Player.HasAudio</visible>
         <include>VisibleFadeEffect</include>
@@ -2015,7 +2051,7 @@
       <label>Media</label>
       <thumb fallback="special://skin/backgrounds/mvl_bg.jpg">$INFO[Skin.String(Videos.Background)]</thumb>
       <onclick>Container.SetViewMode(58)</onclick>
-      <onclick>XBMC.RunAddon(plugin.video.mvl.staging)</onclick>
+      <onclick>XBMC.RunAddon(plugin.video.mvl)</onclick>
 	  <!--onclick>XBMC.ActivateWindow(Videos)</onclick-->
 	  <onfocus>Container.SetViewMode(58)</onfocus>
     </item>
@@ -2117,7 +2153,7 @@
       <label>Get Update</label>
       <thumb fallback="special://skin/backgrounds/mvl_bg.jpg">$INFO[Skin.String(Weather.Background)]</thumb>
       <!--onclick>XBMC.UpdateAddonRepos()</onclick-->
-      <onclick>XBMC.RunScript("special://home\addons\plugin.video.mvl.staging\script_update.py")</onclick>
+      <onclick>XBMC.RunScript("special://home\addons\plugin.video.mvl\script_update.py")</onclick>
     </item>
     <!--item id="10" description="Settings">
       <visible>!Skin.HasSetting(Settings.Hide)</visible>
@@ -2129,7 +2165,7 @@
       <visible>!Skin.HasSetting(Quit.Hide)</visible>
       <label fallback="13009">Quit</label>
       <thumb fallback="special://skin/backgrounds/mvl_bg.jpg">$INFO[Skin.String(Quit.Background)]</thumb>
-      <onclick>XBMC.RunScript("special://home\addons\plugin.video.mvl.staging\script_quit.py")</onclick>
+      <onclick>XBMC.RunScript("special://home\addons\plugin.video.mvl\script_quit.py")</onclick>
     </item>
   </include>
   <include name="Home.Submenu.Items">

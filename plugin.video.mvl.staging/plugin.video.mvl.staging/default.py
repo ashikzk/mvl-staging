@@ -15,6 +15,7 @@ f.write('true')
 f.close()
 ####
 
+
 from xbmcswift2 import Plugin, xbmcgui, xbmc, xbmcaddon, xbmcplugin, actions
 import urllib2
 import time
@@ -50,8 +51,8 @@ plugin = Plugin()
 pluginhandle = int(sys.argv[1])
 usrsettings = xbmcaddon.Addon(id=plugin_id)
 page_limit = usrsettings.getSetting('page_limit_xbmc')
-authentication = plugin.get_storage('authentication', TTL=1)
-authentication['logged_in'] = 'false'
+# authentication = plugin.get_storage('authentication', TTL=1)
+# authentication['logged_in'] = 'false'
 username = usrsettings.getSetting('username_xbmc')
 activation_key = usrsettings.getSetting('activationkey_xbmc')
 usrsettings.setSetting(id='mac_address', value=usrsettings.getSetting('mac_address'))
@@ -846,7 +847,13 @@ def get_categories(id, page):
 
             hide_busy_dialog()
 
-            plugin.log.info("View mode = " + str(mvl_view_mode))
+            #plugin.log.info("View mode = " + str(mvl_view_mode))
+            #set current section name
+            if id == '1':
+                xbmc.executebuiltin('Skin.SetString(CurrentSection,Movies)')
+            elif id == '3':
+                xbmc.executebuiltin('Skin.SetString(CurrentSection,TV)')
+
 
             return items
         # except IOError:
@@ -1009,6 +1016,9 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             self.close()
             play_video(self.source_url, self.title)
 
+        elif control == 23:
+            self.close()
+
 
 @plugin.route('/show_popup/<url>/<title>/<trailer>')
 def show_popup(url, title, trailer):
@@ -1148,6 +1158,8 @@ def get_trailer_url(mvl_meta):
 
 
 def login_check():
+    return True
+
     try:
         url = server_url + "/api/index.php/api/authentication_api/authenticate_user"
         #urlencode is used to create a json object which will be sent to server in POST
@@ -1165,16 +1177,16 @@ def login_check():
         #converting to json object
         plugin.log.info("Debug_Content: " + content)
         myObj = json.loads(content)
-        plugin.log.info(myObj)
+        #plugin.log.info(myObj)
 
-        #creating items from json object
-        for row in myObj:
-            if row['status'] == 1:
-                return True
-            else:
-                # xbmc.executebuiltin('Notification(License Limit Reached,' + row['message'] + ')')
-                showMessage('Error', 'License Limit Reached for user '+username+', '+ row['message'])
-                return False
+        ##creating items from json object
+        #for row in myObj:
+        #    if row['status'] == 1:
+        #        return True
+        #    else:
+        #        # xbmc.executebuiltin('Notification(License Limit Reached,' + row['message'] + ')')
+        #        showMessage('Error', 'License Limit Reached for user '+username+', '+ row['message'])
+        #        return False
     except IOError:
         # xbmc.executebuiltin('Notification(Unreachable Host,Could not connect to server,5000,/error.png)')
         dialog_msg()
@@ -1898,7 +1910,7 @@ def remove_favourite(id, title, category):
 
 def sys_exit():
     hide_busy_dialog()
-    plugin.finish(succeeded=True)
+    # plugin.finish(succeeded=True)
     xbmc.executebuiltin("XBMC.ActivateWindow(Home)")
 
 
