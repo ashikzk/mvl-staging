@@ -182,7 +182,7 @@
         <width>1200</width>
         <height>35</height>
         <font>Details</font>
-        <label>$VAR[GlobalHeadings] - Movies</label>
+        <label>$VAR[GlobalHeadings] - [COLOR FF235B9E]Movies[/COLOR]</label>
       </control>
 	  
 	  <control type="label">
@@ -193,7 +193,7 @@
         <width>1200</width>
         <height>35</height>
         <font>Details</font>
-        <label>$VAR[GlobalHeadings] - TV</label>
+        <label>$VAR[GlobalHeadings] - [COLOR FF235B9E]TV[/COLOR]</label>
       </control>
 	  
       <control type="group">
