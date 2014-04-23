@@ -79,7 +79,7 @@
           <width>660</width>
           <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <textcolor>FF00FF00</textcolor>
+          <textcolor>FF1F6C15</textcolor>
         </control>
 
         <control type="label" id="20">

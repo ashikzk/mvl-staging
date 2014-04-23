@@ -69,7 +69,7 @@
         <onleft>10</onleft>
 		<onup>61</onup>
 		<ondown>61</ondown>
-        <textcolor>FF00FF00</textcolor>
+        <textcolor>FF1F6C15</textcolor>
       </control>      
     </control>
   </controls>

@@ -51,7 +51,7 @@
         <height>60</height>
         <width>250</width>
         <label>Close</label>
-        <textcolor>FF00FF00</textcolor>
+        <textcolor>FF1F6C15</textcolor>
         <align>center</align>
         <pulseonselect>true</pulseonselect>
         <onleft>61</onleft>
