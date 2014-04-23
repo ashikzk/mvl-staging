@@ -729,13 +729,12 @@ def get_categories(id, page):
 
                         mvl_img = thumbnail_url
 
-                        content_type = ''
                         if categories['top_level_parent'] == '1':
-                            content_type = 'movie'
+                            mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
                         elif categories['top_level_parent'] == '3':
-                            content_type = 'tvshow'
+                            #playable items of TV show are episodes
+                            mvl_meta = create_meta('episode', categories['title'].encode('utf-8'), categories['release_date'], mvl_img, categories['sub_categories_names'])
 
-                        mvl_meta = create_meta(content_type, categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
                         plugin.log.info('>> meta data-> %s' % mvl_meta)
                         thumbnail_url = ''
 
@@ -746,6 +745,7 @@ def get_categories(id, page):
                                 thumbnail_url = mvl_meta['cover_url']
                         except:
                             thumbnail_url = mvl_img
+
                         # New condition added
                         if thumbnail_url == '':
                             thumbnail_url = art('image-not-available.png')
@@ -763,6 +763,8 @@ def get_categories(id, page):
                         except:
                             mvl_plot = categories['synopsis'].encode('utf-8')
 
+                        print categories['release_date']
+
                         items += [{
                                       'thumbnail': thumbnail_url,
                                       'properties': {
@@ -779,7 +781,9 @@ def get_categories(id, page):
                                           'plot': mvl_plot,
                                           'genre': categories['sub_categories_names'],
                                           'cast': categories['actors'].encode('utf-8'),
-                                          'year': categories['release_date']
+                                          'year': categories['release_date'],
+                                          'premiered': categories['release_date'],
+                                          'duration': mvl_meta['duration']
                                       },
                                       'path': plugin.url_for('get_videos', id=categories['video_id'],
                                                              thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8')),
@@ -841,6 +845,7 @@ def get_categories(id, page):
 
                 dp.close()
 
+            # xbmcplugin.setContent(pluginhandle, 'Episodes')
 
             #we should set the view_mode as last thing in this method
             #because if user cancels his action and goes back before the api response
@@ -866,6 +871,7 @@ def get_categories(id, page):
         # except IOError:
             # xbmc.executebuiltin('Notification(Unreachable Host,Could not connect to server,5000,/script.hellow.world.png)')
         except Exception, e:
+
             if id in ('1', '3'):  # if we were on 1st page, then the viewmode should remain to 58 as an error has occured and we haven't got any data for next screen
                 mvl_view_mode = 58
             elif id in ('23', '104916', '112504', '32', '104917', '366042', '372395', '372396'):
@@ -1176,7 +1182,7 @@ def play_video(url, title):
         dialog_msg()
         hide_busy_dialog()
 
-def create_meta(video_type, title, year, thumb):
+def create_meta(video_type, title, year, thumb, sub_cat=None):
     print video_type
     try:
         year = int(year)
@@ -1190,19 +1196,30 @@ def create_meta(video_type, title, year, thumb):
             if not (meta['imdb_id'] or meta['tvdb_id']):
                 meta = __metaget__.get_meta(video_type, title, year=year)
 
-        else:  # movie
+        elif video_type == 'movie':  # movie
             meta = __metaget__.get_meta(video_type, title, year=year)
             alt_id = meta['tmdb_id']
+
+        elif video_type == 'episode': # tv show episode
+            series_name = sub_cat[sub_cat.find('_')+1:sub_cat.find('_Season')]
+            meta_temp = __metaget__.get_meta('tvshow', series_name)
+
+            episode_title = title[title.find(' ')+1:]
+            season_text = title[0:title.find(' ')]
+            season = season_text[0:season_text.find('x')]
+            episode_num = season_text[season_text.find('x')+1:]
+            meta = __metaget__.get_episode_meta(episode_title, meta_temp['imdb_id'], season, episode_num)
 
         if video_type == 'tvshow':
             meta['cover_url'] = meta['banner_url']
         if meta['cover_url'] in ('/images/noposter.jpg', ''):
             meta['cover_url'] = thumb
 
-        # print 'Done TV'
-        # print meta
+        print 'Done TV'
+        print meta
 
     except Exception, e:
+        print e
         plugin.log.info('Error assigning meta data for %s %s %s' % (video_type, title, year))
         plugin.log.info(e)
         traceback.print_exc()
@@ -1210,7 +1227,11 @@ def create_meta(video_type, title, year, thumb):
     return meta
 
 def get_trailer_url(mvl_meta):
-    trailer = mvl_meta['trailer_url']
+    trailer = ''
+
+    if 'trailer_url' in mvl_meta:
+        trailer = mvl_meta['trailer_url']
+
     if trailer == '':
         trailer = 'NONE'
 
@@ -1436,7 +1457,14 @@ def search(category):
                             dp_type = 'movie'
                             
                             mvl_img = thumbnail_url
-                            mvl_meta = create_meta('movie', categories['title'], '', thumbnail_url)
+
+                            if categories['top_level_parent'] == '1':
+                                mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
+                            elif categories['top_level_parent'] == '3':
+                                #playable items of TV show are episodes
+                                mvl_meta = create_meta('episode', categories['title'].encode('utf-8'), categories['release_date'], mvl_img, categories['sub_categories_names'])
+                            # mvl_meta = create_meta('movie', categories['title'], '', thumbnail_url)
+
                             plugin.log.info('meta data-> %s' % mvl_meta)
                             thumbnail_url = ''
                             try:
@@ -1477,7 +1505,9 @@ def search(category):
                                               'plot': mvl_plot,
                                               'genre': categories['sub_categories_names'],
                                               'cast': categories['actors'].encode('utf-8'),
-                                              'year': categories['release_date']
+                                              'year': categories['release_date'],
+                                              'premiered': categories['release_date'],
+                                              'duration': mvl_meta['duration']
                                           },
                                           'path': plugin.url_for('get_videos', id=categories['video_id'], thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8')),
                                           'is_playable': False,
@@ -1723,8 +1753,14 @@ def get_azlist(key, page, category):
                         dp_type = 'movie'
 
                         mvl_img = thumbnail_url
-                        #print "TITLE = " + results['title']
-                        mvl_meta = create_meta('movie', results['title'], '', thumbnail_url)
+
+                        if results['top_level_parent'] == '1':
+                            mvl_meta = create_meta('movie', results['title'].encode('utf-8'), results['release_date'], mvl_img)
+                        elif results['top_level_parent'] == '3':
+                            #playable items of TV show are episodes
+                            mvl_meta = create_meta('episode', results['title'].encode('utf-8'), results['release_date'], mvl_img, results['sub_categories_names'])
+                        # mvl_meta = create_meta('movie', results['title'], '', thumbnail_url)
+
                         plugin.log.info('meta data-> %s' % mvl_meta)
                         thumbnail_url = ''
                         try:
@@ -1763,7 +1799,10 @@ def get_azlist(key, page, category):
                                           'plot': mvl_plot,
                                           'genre': results['sub_categories_names'],
                                           'cast': results['actors'].encode('utf-8'),
-                                          'year': results['release_date']
+                                          'year': results['release_date'],
+                                          'premiered': results['release_date'],
+                                          'duration': mvl_meta['duration']
+
                                       },
                                       'path': plugin.url_for('get_videos', id=results['video_id'],
                                                              thumbnail=results['thumbnail'], trailer=get_trailer_url(mvl_meta).encode('utf-8')),
