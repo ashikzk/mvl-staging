@@ -1,4 +1,5 @@
 <window type="dialog" id="1234">
+    <zorder>-2</zorder>
 	<defaultcontrol always="true">9001</defaultcontrol>
 	<coordinates>
 	<system>1</system>
@@ -61,7 +62,7 @@
         </control>
 
         <control type="button" id="24" description="CriticReview">
-          <label>Critic's Review</label>
+          <label>Read Movie Review</label>
           <width>660</width>
           <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
