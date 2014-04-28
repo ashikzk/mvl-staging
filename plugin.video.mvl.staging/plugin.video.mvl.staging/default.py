@@ -1030,8 +1030,6 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
         self.source_url = source_url
         self.title = title
 
-        print 'setting up ... '
-
     def updateLabels(self):
         self.show()
         self.getControl(20).setLabel(self.source_url)
@@ -1048,6 +1046,7 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
 
             if self.trailer_id == 'NONE':
                 showMessage('Error', 'No trailer found')
+                resume_popup_window()
             else:
                 play_video(self.trailer_url, self.title + ' - Official trailer')
 
@@ -1061,9 +1060,9 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             self.close()
 
         elif control == 24:
-            # self.close()
+            self.close()
             show_review()
-            # print 'finish'
+
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
@@ -1076,15 +1075,21 @@ class CustomReviewPopup(xbmcgui.WindowXMLDialog):
         self.show()
         self.getControl(1).setLabel('Less Redemption, More Tears'+'\n[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
         self.getControl(2).setText(review)
+
         self.close()
 
     def onClick	(self, control):
         if control == 11:
             self.close()
+            resume_popup_window()
 
+
+video_popup = None
 
 @plugin.route('/show_popup/<url>/<title>/<trailer>/<parent_id>')
 def show_popup(url, title, trailer, parent_id):
+    global video_popup
+
     if parent_id == '1':
         video_popup = CustomPopup('Custom-VideoPopUp-Movies.xml', os.path.dirname(os.path.realpath(__file__)))
     elif parent_id == '3':
@@ -1093,22 +1098,26 @@ def show_popup(url, title, trailer, parent_id):
     video_popup.setParams(trailer, url, title)
     video_popup.updateLabels()
 
-    #save current state
-    # file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
-    # f = open(file_path, 'w')
-    # f.write(url+'\n')
-    # f.write(title+'\n')
-    # f.write(trailer+'\n')
-    # f.write(parent_id+'\n')
-    # f.close()
+    try:
+        #save current state
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
+        f = open(file_path, 'w')
+        f.write(url+'\n')
+        f.write(title+'\n')
+        f.write(trailer+'\n')
+        f.write(parent_id)
+        f.close()
+    except Exception,e:
+        print e
 
     video_popup.doModal()
 
     hide_busy_dialog()
-    exit()
-
+    # exit()
 
 def show_review():
+    global video_popup
+
     hide_busy_dialog()
     xbmc.executebuiltin( "ActivateWindow(busydialog)" )
 
@@ -1140,31 +1149,59 @@ def show_review():
 
 
 
-# def resume_popup_window():
-#     try:
-#         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
-#         f = open(file_path, 'r')
-#         url = f.readline()
-#
-#         if len(url) != 0:
-#             title = f.readline()
-#             trailer = f.readline()
-#             parent_id = f.readline()
-#             f.close()
-#
-#             print url
-#             print title
-#             print trailer
-#
-#             show_popup(url, title, trailer, parent_id)
-#
-#         else:
-#             f.close()
-#
-#     except Exception, e:
-#         pass
-#
+def resume_popup_window():
 
+    print 'resuming'
+    time.sleep(2)
+    print 'sleep done'
+
+    try:
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
+        f = open(file_path, 'r')
+        url = f.readline().strip('\n')
+
+        if len(url) != 0:
+            title = f.readline().strip('\n')
+            trailer = f.readline().strip('\n')
+            parent_id = f.readline()
+            f.close()
+
+            f = open(file_path, 'w')
+            f.close()
+
+            show_popup(url, title, trailer, parent_id)
+        else:
+            f.close()
+
+
+    except Exception, e:
+        pass
+
+
+class MVLPlayer(xbmc.Player):
+    def __init__( self, *args, **kwargs ):
+        xbmc.Player.__init__( self )
+
+    def PlayVideo(self, url):
+        self.play(url)
+
+        try:
+            while self.isPlaying():
+                xbmc.sleep(1000)
+        except:
+            pass
+
+    def onPlayBackStarted(self):
+        # print "PLAYBACK STARTED"
+        pass
+
+    def onPlayBackEnded(self):
+        # print "PLAYBACK ENDED"
+        resume_popup_window()
+
+    def onPlayBackStopped(self):
+        # print "PLAYBACK STOPPED"
+        resume_popup_window()
 
 @plugin.route('/play_video/<url>/<title>')
 def play_video(url, title):
@@ -1230,9 +1267,9 @@ def play_video(url, title):
 
 
                     playlist.add(url=hostedurl, listitem=listitem, index=0)
-                    #playlist.add(url='http://r8---sn-npo7ene7.googlevideo.com/videoplayback?ipbits=0&upn=P83ZO5hdK0s&ip=27.147.135.178&key=yt5&signature=05ED62D8BA773E5CE1F58C33819179958B31DAB5.470D1ECFF943E939599AE09C197BD7EBD1313BBA&itag=22&id=o-AOeCMalj5EEm_c8SEutkhjE6jjk562hXbW6ktCEJy1CX&ratebypass=yes&fexp=941290,902545,937417,913434,936916,934022,936923&ms=au&mt=1397988460&mv=m&expire=1398014603&sver=3&source=youtube&sparams=id,ip,ipbits,itag,ratebypass,source,upn,expire', listitem=listitem, index=0)
 
-                    xbmc.Player().play(playlist)
+                    # xbmc.Player().play(playlist)
+                    MVLPlayer().PlayVideo(playlist)
                     #return None
                 else:
                     unplayable = True
