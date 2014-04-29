@@ -1113,7 +1113,7 @@ def show_popup(url, title, trailer, parent_id):
     video_popup.doModal()
 
     hide_busy_dialog()
-    # exit()
+    exit()
 
 def show_review():
     global video_popup
@@ -1151,9 +1151,9 @@ def show_review():
 
 def resume_popup_window():
 
-    print 'resuming'
-    time.sleep(2)
-    print 'sleep done'
+    #print 'resuming'
+    #time.sleep(2)
+    #print 'sleep done'
 
     try:
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
