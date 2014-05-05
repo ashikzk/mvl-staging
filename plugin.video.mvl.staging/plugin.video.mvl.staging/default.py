@@ -1153,6 +1153,9 @@ def show_review(video_id):
         if len(review) != 0:
             video_popup.updateReviewText(review, critic_name, review_publish_date, heading)
             video_popup.doModal()
+        else:
+            showMessage('Sorry!', 'No review found for this movie')
+            resume_popup_window()
 
     except Exception, e:
         pass
