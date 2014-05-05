@@ -17,20 +17,20 @@
         <posx>0</posx>
         <posy>60</posy>
         <width>1920</width>
-        <height>90</height>
+        <height>45</height>
         <align>center</align>
         <font>size22</font>
         <textcolor>Orange</textcolor>
       </control>
-      <!--<control type="label" id="3" description="Header2">-->
-        <!--<posx>0</posx>-->
-        <!--<posy>135</posy>-->
-        <!--<width>1920</width>-->
-        <!--<height>45</height>-->
-        <!--<align>center</align>-->
-        <!--<font>size22</font>-->
-        <!--<textcolor>Orange</textcolor>-->
-      <!--</control>-->
+      <control type="label" id="4" description="Header2">
+        <posx>0</posx>
+        <posy>105</posy>
+        <width>1920</width>
+        <height>45</height>
+        <align>center</align>
+        <font>font13</font>
+        <textcolor>Orange</textcolor>
+      </control>
       <control type="textbox" id="2" description="TextArea">
         <posx>424</posx>
         <posy>170</posy>
