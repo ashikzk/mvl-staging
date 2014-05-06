@@ -1606,6 +1606,7 @@ def search(category):
                             dp_type = 'movie'
                             
                             mvl_img = thumbnail_url
+                            series_name = 'NONE'
 
                             if categories['top_level_parent'] == '1':
                                 mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
@@ -1613,6 +1614,8 @@ def search(category):
                                 #playable items of TV show are episodes
                                 mvl_meta = create_meta('episode', categories['title'].encode('utf-8'), categories['release_date'], mvl_img, categories['sub_categories_names'])
                                 # mvl_meta = create_meta('movie', categories['title'], '', thumbnail_url)
+                                if 'series_name' in mvl_meta:
+                                    series_name = mvl_meta['series_name'].strip()
                                 #set layout to Episode
                                 xbmcplugin.setContent(pluginhandle, 'Episodes')
 
@@ -1662,7 +1665,7 @@ def search(category):
                                           },
                                           'path': plugin.url_for('get_videos', id=categories['video_id'],
                                                                  thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8'),
-                                                                 parent_id=categories['top_level_parent']),
+                                                                 parent_id=categories['top_level_parent'], series_name=series_name),
                                           'is_playable': False,
                                           'context_menu': [(
                                                                'Mark as Watched',
@@ -1703,6 +1706,7 @@ def search(category):
                 hide_busy_dialog()
                 
             except Exception,e:
+
                 mvl_view_mode = 59
                 hide_busy_dialog()
                 return None
@@ -1929,6 +1933,7 @@ def get_azlist(key, page, category):
                         dp_type = 'movie'
 
                         mvl_img = thumbnail_url
+                        series_name = 'NONE'
 
                         if results['top_level_parent'] == '1':
                             mvl_meta = create_meta('movie', results['title'].encode('utf-8'), results['release_date'], mvl_img)
@@ -1936,6 +1941,8 @@ def get_azlist(key, page, category):
                             #playable items of TV show are episodes
                             mvl_meta = create_meta('episode', results['title'].encode('utf-8'), results['release_date'], mvl_img, results['sub_categories_names'])
                             # mvl_meta = create_meta('movie', results['title'], '', thumbnail_url)
+                            if 'series_name' in mvl_meta:
+                                series_name = mvl_meta['series_name'].strip()
                             #set layout to Episode
                             xbmcplugin.setContent(pluginhandle, 'Episodes')
 
@@ -1984,7 +1991,7 @@ def get_azlist(key, page, category):
                                       },
                                       'path': plugin.url_for('get_videos', id=results['video_id'],
                                                              thumbnail=results['thumbnail'], trailer=get_trailer_url(mvl_meta).encode('utf-8'),
-                                                             parent_id=results['top_level_parent']),
+                                                             parent_id=results['top_level_parent'], series_name=series_name),
                                       'is_playable': False,
                                       'context_menu': [(
                                                            'Mark as Watched',
