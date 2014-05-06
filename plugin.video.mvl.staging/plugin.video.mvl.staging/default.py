@@ -953,7 +953,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                       }]
 
 
-            src_list = ['movreel', 'mightyupload', 'promptfile', 'hugefile', 'billionupload', '180upload', 'lemupload', 'gorillavid']
+            src_list = ['firedrive', 'putlocker', 'novamov', 'movpod', 'filenuke', 'sockshare', 'movreel', 'mightyupload', 'promptfile', 'hugefile', 'billionupload', '180upload', 'lemupload', 'gorillavid']
 
             for urls in jsonObj:
                 src_order = 0
@@ -964,11 +964,17 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
 
                 urls['src_order'] = src_order
 
+                if urls['resolved_URL'] == '':
+                    urls['resolved_URL'] = 'NONE'
+
             jsonObj.sort(key=lambda x: x['src_order'])
 
             count = 0
             sd_count = 0
             for urls in jsonObj:
+                if urls['resolved_URL'] == 'NONE':
+                    continue
+
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
                 if source_url.find('www.') != -1:
@@ -985,12 +991,15 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                         items += [{
                                       'label': '{0} [COLOR FF235B9E]Source {1}[/COLOR] [COLOR {2}]{3}[/COLOR]'.format(content, count, source_color, source_quality),
                                       'thumbnail': thumbnail,
-                                      'path': plugin.url_for('show_popup', url=urls['URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
+                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
                                       'is_playable': False,
                                   }]
 
             hd_count = 0
             for urls in jsonObj:
+                # if urls['resolved_URL'] == 'NONE':
+                #     continue
+
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
                 if source_url.find('www.') != -1:
@@ -1007,7 +1016,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                         items += [{
                                       'label': '{0} [COLOR FF235B9E]Source {1}[/COLOR] [COLOR {2}]{3}[/COLOR]'.format(content, count, source_color, source_quality),
                                       'thumbnail': thumbnail,
-                                      'path': plugin.url_for('show_popup', url=urls['URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
+                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
                                       'is_playable': False,
                                   }]
 
@@ -1027,10 +1036,11 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
         pass
 
-    def setParams(self, trailer_id, source_url, title, video_id):
+    def setParams(self, trailer_id, source_url, resolved_url, title, video_id):
         self.trailer_id = trailer_id
         self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
         self.source_url = source_url
+        self.resolved_url = resolved_url
         self.title = title
         self.video_id = video_id
 
@@ -1052,12 +1062,12 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
                 showMessage('Error', 'No trailer found')
                 resume_popup_window()
             else:
-                play_video(self.trailer_url, self.title + ' - Official trailer')
+                play_video(self.trailer_url, '', self.title + ' - Official trailer')
 
 
         elif control == 22:
             self.close()
-            play_video(self.source_url, self.title)
+            play_video(self.source_url, self.resolved_url, self.title)
 
         elif control == 23:
             #exit
@@ -1092,8 +1102,8 @@ class CustomReviewPopup(xbmcgui.WindowXMLDialog):
 
 video_popup = None
 
-@plugin.route('/show_popup/<url>/<title>/<trailer>/<parent_id>/<video_id>/<series_name>')
-def show_popup(url, title, trailer, parent_id, video_id, series_name):
+@plugin.route('/show_popup/<url>/<resolved_url>/<title>/<trailer>/<parent_id>/<video_id>/<series_name>')
+def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_name):
     global video_popup
 
     if parent_id == '1':
@@ -1105,7 +1115,7 @@ def show_popup(url, title, trailer, parent_id, video_id, series_name):
     if series_name != 'NONE':
         video_title = series_name + ' : ' + title
 
-    video_popup.setParams(trailer, url, video_title, video_id)
+    video_popup.setParams(trailer, url, resolved_url, video_title, video_id)
     video_popup.updateLabels()
 
     try:
@@ -1113,6 +1123,7 @@ def show_popup(url, title, trailer, parent_id, video_id, series_name):
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'popup_state.dat')
         f = open(file_path, 'w')
         f.write(url+'\n')
+        f.write(resolved_url+'\n')
         f.write(title+'\n')
         f.write(trailer+'\n')
         f.write(parent_id+'\n')
@@ -1173,6 +1184,7 @@ def resume_popup_window():
         url = f.readline().strip('\n')
 
         if len(url) != 0:
+            resolved_url = f.readline().strip('\n')
             title = f.readline().strip('\n')
             trailer = f.readline().strip('\n')
             parent_id = f.readline().strip('\n')
@@ -1183,7 +1195,7 @@ def resume_popup_window():
             f = open(file_path, 'w')
             f.close()
 
-            show_popup(url, title, trailer, parent_id, video_id, series_name)
+            show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_name)
         else:
             f.close()
 
@@ -1217,32 +1229,37 @@ class MVLPlayer(xbmc.Player):
         # print "PLAYBACK STOPPED"
         resume_popup_window()
 
-@plugin.route('/play_video/<url>/<title>')
-def play_video(url, title):
+@plugin.route('/play_video/<url>/<resolved_url>/<title>')
+def play_video(url, resolved_url, title):
     global mvl_view_mode
 
     if check_internet():
-        show_notification()
+        # show_notification()
 
         mvl_view_mode = 50
         #if login is successful then selected item will be resolved using urlresolver and played
         if login_check():
             unplayable = False
             try:
-                if url.find('youtube.com') == -1:
-                    #first import urlresolver
-                    #as this takes a while, we'll be importing it only when required
-                    import urlresolver
-                    #plugin.log.info(url)
-                    hostedurl = urlresolver.HostedMediaFile(url).resolve()
-                    #plugin.log.info(hostedurl)
-                else:
+                if resolved_url != 'NONE':
+                    #no need to resolve the url on client side
+                    #use the pre-resolved url
+                    hostedurl = resolved_url
+                elif url.find('youtube.com') != -1:
                     #this is youtube video
                     #resolve ourselves
                     from resources.youtube import YouTubeResolver
                     yt = YouTubeResolver()
                     host, media_id = yt.get_host_and_id(url)
                     hostedurl = yt.get_media_url(host, media_id)
+                else:
+                    #we have to resolve this url on client side cause it isn't pre-resolved or youtube url
+                    #first import urlresolver
+                    #as this takes a while, we'll be importing it only when required
+                    import urlresolver
+                    #plugin.log.info(url)
+                    hostedurl = urlresolver.HostedMediaFile(url).resolve()
+                    #plugin.log.info(hostedurl)
 
                 if str(hostedurl)[0] == 'h':# or str(hostedurl)[0] == 'p':
                     source_url = url[ url.find('://')+3: ]
