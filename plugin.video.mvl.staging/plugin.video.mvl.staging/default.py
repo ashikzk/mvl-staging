@@ -718,11 +718,24 @@ def get_categories(id, page):
 
                         else:
 
+                            button_name = categories['title']
+
+                            if categories['parent_id'] == '1':
+                                if categories['title'] == 'New Releases':
+                                    button_name = 'Date Released'
+                                elif categories['title'] == 'Featured':
+                                    button_name = 'Cinema'
+                            elif categories['parent_id'] == '3':
+                                if categories['title'] == 'New Releases':
+                                    button_name = 'Date Aired'
+                                elif categories['title'] == 'Featured':
+                                    button_name = 'Popular TV'
+
                             items += [{
                                           'label': '{0}'.format(categories['title'].encode('utf-8')),
                                           'path': plugin.url_for('get_categories', id=categories['id'], page=0),
                                           'is_playable': False,
-                                          'thumbnail': art('{0}{1}.png'.format(categories['title'].lower(), image_on_off)),
+                                          'thumbnail': art('{0}{1}.png'.format(button_name.lower(), image_on_off)),
                                           'context_menu': [(
                                                                'Mark as Watched',
                                                                'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
@@ -735,7 +748,8 @@ def get_categories(id, page):
                                           'replace_context_menu': True
                                       }]
 
-                            #plugin.log.info(art('{0}.png'.format(categories['title'].lower())))
+                            # print button_name.lower()
+
 
                     #inorder for the information to be displayed properly, corresponding labels should be added in skin
                     elif categories['is_playable'] == 'True':
@@ -972,7 +986,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             count = 0
             sd_count = 0
             for urls in jsonObj:
-                if urls['resolved_URL'] == 'NONE':
+                if parent_id == '1' and urls['resolved_URL'] == 'NONE':
                     continue
 
                 source_quality = ''
@@ -1062,7 +1076,7 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
                 showMessage('Error', 'No trailer found')
                 resume_popup_window()
             else:
-                play_video(self.trailer_url, '', self.title + ' - Official trailer')
+                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer')
 
 
         elif control == 22:
@@ -1233,96 +1247,97 @@ class MVLPlayer(xbmc.Player):
 def play_video(url, resolved_url, title):
     global mvl_view_mode
 
-    if check_internet():
-        # show_notification()
+    # if check_internet():
+    # show_notification()
 
-        mvl_view_mode = 50
-        #if login is successful then selected item will be resolved using urlresolver and played
-        if login_check():
-            unplayable = False
-            try:
-                if resolved_url != 'NONE':
-                    #no need to resolve the url on client side
-                    #use the pre-resolved url
-                    hostedurl = resolved_url
-                elif url.find('youtube.com') != -1:
-                    #this is youtube video
-                    #resolve ourselves
-                    from resources.youtube import YouTubeResolver
-                    yt = YouTubeResolver()
-                    host, media_id = yt.get_host_and_id(url)
-                    hostedurl = yt.get_media_url(host, media_id)
-                else:
-                    #we have to resolve this url on client side cause it isn't pre-resolved or youtube url
-                    #first import urlresolver
-                    #as this takes a while, we'll be importing it only when required
-                    import urlresolver
-                    #plugin.log.info(url)
-                    hostedurl = urlresolver.HostedMediaFile(url).resolve()
-                    #plugin.log.info(hostedurl)
-
-                if str(hostedurl)[0] == 'h':# or str(hostedurl)[0] == 'p':
-                    source_url = url[ url.find('://')+3: ]
-                    if source_url.find('www.') != -1:
-                        source_url = source_url[source_url.find('www.')+4:]
-
-                    hide_busy_dialog()
-                    #plugin.set_resolved_url(hostedurl)
-                    #play the resolved url manually, since we aren't using playable link
-                    playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
-                    playlist.clear()
-
-                    item_title = '[COLOR FFFFFFFF]{0}[/COLOR] | [COLOR FF777777]{1}[/COLOR]'.format(title, source_url)
-                    listitem = xbmcgui.ListItem(item_title)
-
-                    #check if this item already exists
-                    #playlist_len = playlist.__len__()
-                    #item_found = False
-                    #item_index = 0
-
-                    #for i in range(0, playlist_len):
-                    #    #print item_title
-                    #    #print playlist.__getitem__(i).getLabel()
-                    #    #print '---------------'
-                    #    #check to see if this item is already in the playlist
-                    #    if playlist.__getitem__(i).getLabel() == item_title:
-                    #        item_found = True
-                    #        item_index = i
-                    #        break
-
-                    #if item_found:
-                    #    #same filename already exists in playlist
-                    #    #remove same filename from playlist
-                    #    print playlist.remove(hostedurl)
-                    #    print 'inside delete'
-
-
-                    playlist.add(url=hostedurl, listitem=listitem, index=0)
-
-                    # xbmc.Player().play(playlist)
-                    MVLPlayer().PlayVideo(playlist)
-                    #return None
-                else:
-                    unplayable = True
-            except Exception, e:
-                unplayable = True
-                print e
-
-            if unplayable:
-                #video not playable
-                #show error message
-                mvl_view_mode = 50
-                hide_busy_dialog()
-                showMessage('Error loading video', 'This source will not play. Please pick another.')
-                return None
-
+    mvl_view_mode = 50
+    #if login is successful then selected item will be resolved using urlresolver and played
+    # if login_check():
+    unplayable = False
+    try:
+        if resolved_url != 'NONE':
+            #no need to resolve the url on client side
+            #use the pre-resolved url
+            hostedurl = resolved_url
+        elif url.find('youtube.com') != -1:
+            #this is youtube video
+            #resolve ourselves
+            from resources.youtube import YouTubeResolver
+            yt = YouTubeResolver()
+            host, media_id = yt.get_host_and_id(url)
+            hostedurl = yt.get_media_url(host, media_id)
         else:
+            #we have to resolve this url on client side cause it isn't pre-resolved or youtube url
+            #first import urlresolver
+            #as this takes a while, we'll be importing it only when required
+            import urlresolver
+            #plugin.log.info(url)
+            hostedurl = urlresolver.HostedMediaFile(url).resolve()
+            #plugin.log.info(hostedurl)
+
+        if str(hostedurl)[0] == 'h':# or str(hostedurl)[0] == 'p':
+            source_url = url[ url.find('://')+3: ]
+            if source_url.find('www.') != -1:
+                source_url = source_url[source_url.find('www.')+4:]
+
             hide_busy_dialog()
-            pass
-    else:
+            #plugin.set_resolved_url(hostedurl)
+            #play the resolved url manually, since we aren't using playable link
+            playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
+            playlist.clear()
+
+            item_title = '[COLOR FFFFFFFF]{0}[/COLOR] | [COLOR FF777777]{1}[/COLOR]'.format(title, source_url)
+            listitem = xbmcgui.ListItem(item_title)
+
+            #check if this item already exists
+            #playlist_len = playlist.__len__()
+            #item_found = False
+            #item_index = 0
+
+            #for i in range(0, playlist_len):
+            #    #print item_title
+            #    #print playlist.__getitem__(i).getLabel()
+            #    #print '---------------'
+            #    #check to see if this item is already in the playlist
+            #    if playlist.__getitem__(i).getLabel() == item_title:
+            #        item_found = True
+            #        item_index = i
+            #        break
+
+            #if item_found:
+            #    #same filename already exists in playlist
+            #    #remove same filename from playlist
+            #    print playlist.remove(hostedurl)
+            #    print 'inside delete'
+
+
+            playlist.add(url=hostedurl, listitem=listitem, index=0)
+
+            # xbmc.Player().play(playlist)
+            MVLPlayer().PlayVideo(playlist)
+            #return None
+        else:
+            unplayable = True
+    except Exception, e:
+        unplayable = True
+        print e
+
+    if unplayable:
+        #video not playable
+        #show error message
         mvl_view_mode = 50
-        dialog_msg()
         hide_busy_dialog()
+        showMessage('Error loading video', 'This source will not play. Please pick another.')
+        return None
+
+    # else: #login_check
+    #     hide_busy_dialog()
+    #     pass
+
+    # else: #check_internet
+    #     mvl_view_mode = 50
+    #     dialog_msg()
+    #     hide_busy_dialog()
 
 def create_meta(video_type, title, year, thumb, sub_cat=None):
     print video_type
