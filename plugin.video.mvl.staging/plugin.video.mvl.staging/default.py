@@ -605,10 +605,10 @@ def get_categories(id, page):
                         is_search_category = False
 
                         if categories['parent_id'] == '1':
-                            button_name = 'SearchMovies'
+                            button_name = 'SearchMovies1'
                             button_label = 'Search Movies'
                         elif categories['parent_id'] == '3':
-                            button_name = 'SearchTVShows'
+                            button_name = 'SearchTVShows1'
                             button_label = 'Search TV Shows'
 
                         #adding search option
@@ -732,23 +732,23 @@ def get_categories(id, page):
 
                             if categories['parent_id'] == '1':
                                 if categories['title'] == 'New Releases':
-                                    button_name = 'Date Released'
+                                    button_name = 'DateReleased1'
                                     categories['title'] = 'Date Released'
                                 elif categories['title'] == 'Featured':
-                                    button_name = 'Cinema'
+                                    button_name = 'Cinema1'
                                     categories['title'] = 'Cinema Movies'
                                 elif categories['title'] == 'Genre':
-                                    button_name = 'MoviesByGenres'
+                                    button_name = 'MoviesByGenres1'
                                     categories['title'] = 'Movies by Genres'
                             elif categories['parent_id'] == '3':
                                 if categories['title'] == 'New Releases':
-                                    button_name = 'Date Aired'
+                                    button_name = 'DateAired1'
                                     categories['title'] = 'Date Aired'
                                 elif categories['title'] == 'Featured':
-                                    button_name = 'Popular TV'
+                                    button_name = 'PopularTV1'
                                     categories['title'] = 'Popular TV Series'
                                 elif categories['title'] == 'Genre':
-                                    button_name = 'TVByGenres'
+                                    button_name = 'TVByGenres1'
                                     categories['title'] = 'TV Shows by Genres'
 
                             items += [{
@@ -883,10 +883,10 @@ def get_categories(id, page):
                 if main_category_check == True:
                     #adding A-Z listing option
                     if button_category == '1':
-                        button_name = 'AZMovies'
+                        button_name = 'AZMovies1'
                         button_label = 'A-Z Listings for Movies'
                     elif button_category == '3':
-                        button_name = 'AZTvShows'
+                        button_name = 'AZTvShows1'
                         button_label = 'A-Z Listings for TV Shows'
 
                     items += [{
