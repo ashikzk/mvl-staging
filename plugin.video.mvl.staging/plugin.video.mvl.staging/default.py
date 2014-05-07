@@ -884,10 +884,10 @@ def get_categories(id, page):
                     #adding A-Z listing option
                     if button_category == '1':
                         button_name = 'AZMovies1'
-                        button_label = 'A-Z Listings for Movies'
+                        button_label = 'Movies A-Z'
                     elif button_category == '3':
                         button_name = 'AZTvShows1'
-                        button_label = 'A-Z Listings for TV Shows'
+                        button_label = 'TV Shows A-Z'
 
                     items += [{
                                   'label': button_label,
