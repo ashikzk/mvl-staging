@@ -471,6 +471,7 @@ def get_categories(id, page):
 
         #save current view mode in case any error occurs and we need to remain on the same page
         prev_view_mode = mvl_view_mode
+        button_category = None
 
         try:
 
@@ -602,11 +603,19 @@ def get_categories(id, page):
 
                     if is_search_category == True:
                         is_search_category = False
+
+                        if categories['parent_id'] == '1':
+                            button_name = 'SearchMovies'
+                            button_label = 'Search Movies'
+                        elif categories['parent_id'] == '3':
+                            button_name = 'SearchTVShows'
+                            button_label = 'Search TV Shows'
+
                         #adding search option
                         items += [{
-                                  'label': 'Search',
+                                  'label': button_label,
                                   'path': plugin.url_for('search', category=parent_id),
-                                  'thumbnail': art('search'+image_on_off+'.png'),
+                                  'thumbnail': art(button_name.lower()+'.png'),
                                   'is_playable': False,
                                   }]
 
@@ -719,23 +728,34 @@ def get_categories(id, page):
                         else:
 
                             button_name = categories['title']
+                            button_category = categories['parent_id']
 
                             if categories['parent_id'] == '1':
                                 if categories['title'] == 'New Releases':
                                     button_name = 'Date Released'
+                                    categories['title'] = 'Date Released'
                                 elif categories['title'] == 'Featured':
                                     button_name = 'Cinema'
+                                    categories['title'] = 'Cinema Movies'
+                                elif categories['title'] == 'Genre':
+                                    button_name = 'MoviesByGenres'
+                                    categories['title'] = 'Movies by Genres'
                             elif categories['parent_id'] == '3':
                                 if categories['title'] == 'New Releases':
                                     button_name = 'Date Aired'
+                                    categories['title'] = 'Date Aired'
                                 elif categories['title'] == 'Featured':
                                     button_name = 'Popular TV'
+                                    categories['title'] = 'Popular TV Series'
+                                elif categories['title'] == 'Genre':
+                                    button_name = 'TVByGenres'
+                                    categories['title'] = 'TV Shows by Genres'
 
                             items += [{
                                           'label': '{0}'.format(categories['title'].encode('utf-8')),
                                           'path': plugin.url_for('get_categories', id=categories['id'], page=0),
                                           'is_playable': False,
-                                          'thumbnail': art('{0}{1}.png'.format(button_name.lower(), image_on_off)),
+                                          'thumbnail': art('{0}.png'.format(button_name.lower())),
                                           'context_menu': [(
                                                                'Mark as Watched',
                                                                'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
@@ -862,10 +882,17 @@ def get_categories(id, page):
 
                 if main_category_check == True:
                     #adding A-Z listing option
+                    if button_category == '1':
+                        button_name = 'AZMovies'
+                        button_label = 'A-Z Listings for Movies'
+                    elif button_category == '3':
+                        button_name = 'AZTvShows'
+                        button_label = 'A-Z Listings for TV Shows'
+
                     items += [{
-                                  'label': 'A-Z Listings',
+                                  'label': button_label,
                                   'path': plugin.url_for('azlisting', category=parent_id),
-                                  'thumbnail': art('A-Z'+image_on_off+'.png'),
+                                  'thumbnail': art(button_name.lower()+'.png'),
                                   'is_playable': False,
                               }]
                     #Most Popular & Favortite are commented out on Client's request for now
@@ -1176,6 +1203,9 @@ def show_review(video_id):
         review_publish_date = jsonObj['publish_date']
 
         if len(review) != 0:
+            #replace <br> tags with "\n" for better viewing
+            review = review.strip("\n")
+            review = review.replace("<br>", "\n")
             video_popup.updateReviewText(review, critic_name, review_publish_date, heading)
             video_popup.doModal()
         else:
