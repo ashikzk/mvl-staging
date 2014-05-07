@@ -743,7 +743,7 @@ def get_categories(id, page):
                             elif categories['parent_id'] == '3':
                                 if categories['title'] == 'New Releases':
                                     button_name = 'DateAired1'
-                                    categories['title'] = 'Date Aired'
+                                    categories['title'] = 'Recently Aired'
                                 elif categories['title'] == 'Featured':
                                     button_name = 'PopularTV1'
                                     categories['title'] = 'Popular TV Series'
