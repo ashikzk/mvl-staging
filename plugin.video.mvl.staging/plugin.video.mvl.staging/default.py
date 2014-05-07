@@ -1013,8 +1013,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             count = 0
             sd_count = 0
             for urls in jsonObj:
-                if parent_id == '1' and urls['resolved_URL'] == 'NONE':
-                    continue
+                #if parent_id == '1' and urls['resolved_URL'] == 'NONE':
+                #    continue
 
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
