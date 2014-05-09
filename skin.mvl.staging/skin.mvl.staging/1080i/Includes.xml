@@ -283,7 +283,8 @@
     </control>
   </include>
   <include name="Stars">
-    <visible>!IsEmpty(ListItem.StarRating)</visible>
+    <!-- <visible>!IsEmpty(ListItem.StarRating)</visible> -->
+    <visible>False</visible>
     <height>24</height>
     <width>174</width>
     <aspectratio align="left">keep</aspectratio>

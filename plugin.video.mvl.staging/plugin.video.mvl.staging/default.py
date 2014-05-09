@@ -623,6 +623,15 @@ def get_categories(id, page):
                     #add an extra item for the release month + year combo
                     if 'release_group' in categories:
                         if categories['release_group'] != last_release_group:
+                            if last_release_group == '':
+                                #that means this is the first line of list
+                                items += [{
+                                              'label': '[COLOR FF2261B4]Estimated Release Date[/COLOR]',
+                                              'path': plugin.url_for('do_nothing', view_mode=0),
+                                              'is_playable': False,
+                                          }]
+
+
                             last_release_group = categories['release_group']
 
                             items += [{
@@ -713,15 +722,15 @@ def get_categories(id, page):
                                               'fanart_image': fanart_url,
                                           },
                                           'info': info_dic,
-                                          'context_menu': [(
-                                                               'Mark as Watched',
-                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                     id=categories['id'],
-                                                                                                     title=categories['title'].encode('utf-8'),
-                                                                                                     thumbnail="None",
-                                                                                                     isplayable="False",
-                                                                                                     category=categories['top_level_parent'])
-                                                           )],
+                                          # 'context_menu': [(
+                                          #                      'Mark as Watched',
+                                          #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                          #                                                            id=categories['id'],
+                                          #                                                            title=categories['title'].encode('utf-8'),
+                                          #                                                            thumbnail="None",
+                                          #                                                            isplayable="False",
+                                          #                                                            category=categories['top_level_parent'])
+                                          #                  )],
                                           'replace_context_menu': True
                                       }]
 
@@ -738,8 +747,8 @@ def get_categories(id, page):
                                     button_name = 'Cinema1'
                                     categories['title'] = 'Cinema Movies'
                                 elif categories['title'] == 'Genre':
-                                    button_name = 'MoviesByGenres1'
-                                    categories['title'] = 'Movies by Genres'
+                                    button_name = 'MovieGenres2'
+                                    categories['title'] = 'Movies by Genre'
                             elif categories['parent_id'] == '3':
                                 if categories['title'] == 'New Releases':
                                     button_name = 'DateAired1'
@@ -749,22 +758,22 @@ def get_categories(id, page):
                                     categories['title'] = 'Popular TV Series'
                                 elif categories['title'] == 'Genre':
                                     button_name = 'TVByGenres1'
-                                    categories['title'] = 'TV Shows by Genres'
+                                    categories['title'] = 'TV Shows by Genre'
 
                             items += [{
                                           'label': '{0}'.format(categories['title'].encode('utf-8')),
                                           'path': plugin.url_for('get_categories', id=categories['id'], page=0),
                                           'is_playable': False,
                                           'thumbnail': art('{0}.png'.format(button_name.lower())),
-                                          'context_menu': [(
-                                                               'Mark as Watched',
-                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                     id=categories['id'],
-                                                                                                     title=categories['title'].encode('utf-8'),
-                                                                                                     thumbnail="None",
-                                                                                                     isplayable="False",
-                                                                                                     category=categories['top_level_parent'])
-                                                           )],
+                                          # 'context_menu': [(
+                                          #                      'Mark as Watched',
+                                          #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                          #                                                            id=categories['id'],
+                                          #                                                            title=categories['title'].encode('utf-8'),
+                                          #                                                            thumbnail="None",
+                                          #                                                            isplayable="False",
+                                          #                                                            category=categories['top_level_parent'])
+                                          #                  )],
                                           'replace_context_menu': True
                                       }]
 
@@ -786,11 +795,20 @@ def get_categories(id, page):
                         mvl_img = thumbnail_url
                         series_name = 'NONE'
 
+                        watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
+
                         if categories['top_level_parent'] == '1':
                             mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
+                            watch_info['year'] = mvl_meta['year']
                         elif categories['top_level_parent'] == '3':
                             #playable items of TV show are episodes
                             mvl_meta = create_meta('episode', categories['title'].encode('utf-8'), categories['release_date'], mvl_img, categories['sub_categories_names'])
+
+                            watch_info['video_type'] = 'episode'
+                            watch_info['season'] = mvl_meta['season']
+                            watch_info['episode'] = mvl_meta['episode']
+                            watch_info['year'] = mvl_meta['premiered'][:4]
+
                             if 'series_name' in mvl_meta:
                                 series_name = mvl_meta['series_name'].strip()
                             #set layout to Episode
@@ -844,7 +862,8 @@ def get_categories(id, page):
                                           'cast': categories['actors'].encode('utf-8'),
                                           'year': categories['release_date'],
                                           'premiered': categories['release_date'],
-                                          'duration': mvl_meta['duration']
+                                          'duration': mvl_meta['duration'],
+                                          'playcount': mvl_meta['playcount']
                                       },
                                       'path': plugin.url_for('get_videos', id=categories['video_id'],
                                                              thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8'),
@@ -852,12 +871,14 @@ def get_categories(id, page):
                                       'is_playable': False,
                                       'context_menu': [(
                                                            'Mark as Watched',
-                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                 id=categories['video_id'],
+                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                                                                 video_type=watch_info['video_type'],
                                                                                                  title=categories['title'].encode('utf-8'),
-                                                                                                 thumbnail=thumbnail_url,
-                                                                                                 isplayable="True",
-                                                                                                 category=categories['top_level_parent'])
+                                                                                                 imdb_id=mvl_meta['imdb_id'],
+                                                                                                 year=watch_info['year'],
+                                                                                                 season=watch_info['season'],
+                                                                                                 episode=watch_info['episode']
+                                                                                                 )
                                                        )],
                                       'replace_context_menu': True
                                   }]
@@ -939,7 +960,7 @@ def get_categories(id, page):
         # except IOError:
             # xbmc.executebuiltin('Notification(Unreachable Host,Could not connect to server,5000,/script.hellow.world.png)')
         except Exception, e:
-            #print e
+            print e
 
             if id in ('1', '3'):  # if we were on 1st page, then the viewmode should remain to 58 as an error has occured and we haven't got any data for next screen
                 mvl_view_mode = 58
@@ -988,7 +1009,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             # instruction text
             items += [{
                           #'label': '[COLOR FFFFFF00]Please click on a link below to begin viewing[/COLOR] [COLOR FFFF0000]* HD[/COLOR] [COLOR FFFFFFFF]sources require a minimum of [COLOR FFFF0000]40mb/s[/COLOR] internet speed [COLOR FFFF0000]* Unusable sources[/COLOR] are replaced weekly[/COLOR]',
-                          'label': '[COLOR FFC41D67]Please click on a link below to begin viewing[/COLOR]',
+                          # 'label': '[COLOR FFC41D67]Please click on a link below to begin viewing[/COLOR]',
+                          'label': '[COLOR FFC41D67]MVL may have removed certain links to this content based upon DMCA notice[/COLOR]',
                           'path': plugin.url_for('do_nothing', view_mode=mvl_view_mode),
                           'is_playable': False
                       }]
@@ -1130,7 +1152,7 @@ class CustomReviewPopup(xbmcgui.WindowXMLDialog):
         self.show()
         #self.getControl(1).setLabel(heading+'\n[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
         self.getControl(1).setLabel(heading)
-        self.getControl(4).setLabel('[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
+        self.getControl(4).setLabel('[COLOR FF888888] By '+critic_name+' ('+review_publish_date+', The New York Times) [/COLOR]')
         self.getControl(2).setText(review)
 
         self.close()
@@ -1632,15 +1654,15 @@ def search(category):
                                                   'fanart_image': fanart_url,
                                               },
                                               'info': info_dic,
-                                              'context_menu': [(
-                                                                   'Mark as Watched',
-                                                                   'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                         id=categories['id'],
-                                                                                                         title=categories['title'].encode('utf-8'),
-                                                                                                         thumbnail="None",
-                                                                                                         isplayable="False",
-                                                                                                         category=categories['top_level_parent'])
-                                                               )],
+                                              # 'context_menu': [(
+                                              #                      'Mark as Watched',
+                                              #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                              #                                                            id=categories['id'],
+                                              #                                                            title=categories['title'].encode('utf-8'),
+                                              #                                                            thumbnail="None",
+                                              #                                                            isplayable="False",
+                                              #                                                            category=categories['top_level_parent'])
+                                              #                  )],
                                               'replace_context_menu': True
                                           }]
 
@@ -1650,15 +1672,15 @@ def search(category):
                                               'path': plugin.url_for('get_categories', id=categories['id'], page=0),
                                               'is_playable': False,
                                               'thumbnail': art('{0}.png'.format(categories['title'].lower())),
-                                              'context_menu': [(
-                                                                   'Mark as Watched',
-                                                                   'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                         id=categories['id'],
-                                                                                                         title=categories['title'],
-                                                                                                         thumbnail="None",
-                                                                                                         isplayable="False",
-                                                                                                         category=category)
-                                                               )],
+                                              # 'context_menu': [(
+                                              #                      'Mark as Watched',
+                                              #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                              #                                                            id=categories['id'],
+                                              #                                                            title=categories['title'],
+                                              #                                                            thumbnail="None",
+                                              #                                                            isplayable="False",
+                                              #                                                            category=category)
+                                              #                  )],
                                               'replace_context_menu': True
                                           }]
                         elif categories['is_playable'] == 'True':
@@ -1670,12 +1692,21 @@ def search(category):
                             mvl_img = thumbnail_url
                             series_name = 'NONE'
 
+                            watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
+
                             if categories['top_level_parent'] == '1':
-                                mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
+                                mvl_meta = create_meta('movie', categories['title'], categories['release_date'], mvl_img)
+                                watch_info['year'] = mvl_meta['year']
                             elif categories['top_level_parent'] == '3':
                                 #playable items of TV show are episodes
-                                mvl_meta = create_meta('episode', categories['title'].encode('utf-8'), categories['release_date'], mvl_img, categories['sub_categories_names'])
+                                mvl_meta = create_meta('episode', categories['title'], categories['release_date'], mvl_img, categories['sub_categories_names'])
                                 # mvl_meta = create_meta('movie', categories['title'], '', thumbnail_url)
+
+                                watch_info['video_type'] = 'episode'
+                                watch_info['season'] = mvl_meta['season']
+                                watch_info['episode'] = mvl_meta['episode']
+                                watch_info['year'] = mvl_meta['premiered'][:4]
+
                                 if 'series_name' in mvl_meta:
                                     series_name = mvl_meta['series_name'].strip()
                                 #set layout to Episode
@@ -1731,12 +1762,14 @@ def search(category):
                                           'is_playable': False,
                                           'context_menu': [(
                                                                'Mark as Watched',
-                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                     id=categories['video_id'],
-                                                                                                     title=categories['title'],
-                                                                                                     thumbnail=thumbnail_url,
-                                                                                                     isplayable="True",
-                                                                                                     category=categories['top_level_parent'])
+                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                                                                 video_type=watch_info['video_type'],
+                                                                                                 title=categories['title'].encode('utf-8'),
+                                                                                                 imdb_id=mvl_meta['imdb_id'],
+                                                                                                 year=watch_info['year'],
+                                                                                                 season=watch_info['season'],
+                                                                                                 episode=watch_info['episode']
+                                                                                                    )
                                                            )],
                                           'replace_context_menu': True
                                       }]
@@ -1957,16 +1990,16 @@ def get_azlist(key, page, category):
                                                   'fanart_image': fanart_url,
                                               },
                                               'info': info_dic,
-                                              'context_menu': [(
-                                                                   'Mark as Watched',
-                                                                   'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                         id=results['id'],
-                                                                                                         title=results['title'].encode('utf-8'),
-                                                                                                         thumbnail="None",
-                                                                                                         isplayable="False",
-                                                                                                         category=results[
-                                                                                                             'top_level_parent'])
-                                                               )],
+                                              # 'context_menu': [(
+                                              #                      'Mark as Watched',
+                                              #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                              #                                                            id=results['id'],
+                                              #                                                            title=results['title'].encode('utf-8'),
+                                              #                                                            thumbnail="None",
+                                              #                                                            isplayable="False",
+                                              #                                                            category=results[
+                                              #                                                                'top_level_parent'])
+                                              #                  )],
                                               'replace_context_menu': True
                                           }]
 
@@ -1976,15 +2009,15 @@ def get_azlist(key, page, category):
                                               'path': plugin.url_for('get_categories', id=results['id'], page=0),
                                               'is_playable': False,
                                               'thumbnail': art('{0}.png'.format(results['title'].lower())),
-                                              'context_menu': [(
-                                                                   'Mark as Watched',
-                                                                   'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                         id=results['id'],
-                                                                                                         title=results['title'].encode('utf-8'),
-                                                                                                         thumbnail="None",
-                                                                                                         isplayable="False",
-                                                                                                         category=category)
-                                                               )],
+                                              # 'context_menu': [(
+                                              #                      'Mark as Watched',
+                                              #                      'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
+                                              #                                                            id=results['id'],
+                                              #                                                            title=results['title'].encode('utf-8'),
+                                              #                                                            thumbnail="None",
+                                              #                                                            isplayable="False",
+                                              #                                                            category=category)
+                                              #                  )],
                                               'replace_context_menu': True
                                           }]
 
@@ -1997,12 +2030,21 @@ def get_azlist(key, page, category):
                         mvl_img = thumbnail_url
                         series_name = 'NONE'
 
+                        watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
+
                         if results['top_level_parent'] == '1':
-                            mvl_meta = create_meta('movie', results['title'].encode('utf-8'), results['release_date'], mvl_img)
+                            mvl_meta = create_meta('movie', results['title'], results['release_date'], mvl_img)
+                            watch_info['year'] = mvl_meta['year']
                         elif results['top_level_parent'] == '3':
                             #playable items of TV show are episodes
-                            mvl_meta = create_meta('episode', results['title'].encode('utf-8'), results['release_date'], mvl_img, results['sub_categories_names'])
+                            mvl_meta = create_meta('episode', results['title'], results['release_date'], mvl_img, results['sub_categories_names'])
                             # mvl_meta = create_meta('movie', results['title'], '', thumbnail_url)
+
+                            watch_info['video_type'] = 'episode'
+                            watch_info['season'] = mvl_meta['season']
+                            watch_info['episode'] = mvl_meta['episode']
+                            watch_info['year'] = mvl_meta['premiered'][:4]
+
                             if 'series_name' in mvl_meta:
                                 series_name = mvl_meta['series_name'].strip()
                             #set layout to Episode
@@ -2057,12 +2099,14 @@ def get_azlist(key, page, category):
                                       'is_playable': False,
                                       'context_menu': [(
                                                            'Mark as Watched',
-                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('save_favourite',
-                                                                                                 id=results['video_id'],
-                                                                                                 title=results['title'],
-                                                                                                 thumbnail=thumbnail_url,
-                                                                                                 isplayable="True",
-                                                                                                 category=results['top_level_parent'])
+                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                                                                 video_type=watch_info['video_type'],
+                                                                                                 title=categories['title'].encode('utf-8'),
+                                                                                                 imdb_id=mvl_meta['imdb_id'],
+                                                                                                 year=watch_info['year'],
+                                                                                                 season=watch_info['season'],
+                                                                                                 episode=watch_info['episode']
+                                                                                               )
                                                        )],
                                       'replace_context_menu': True
                                   }]
@@ -2225,9 +2269,13 @@ def init_database():
     db.close()
 
 
-@plugin.route('/save_favourite/<id>/<title>/<thumbnail>/<isplayable>/<category>')
-def save_favourite(id, title, thumbnail, isplayable, category):
-    __metaget__.change_watched('movie', title, 'tt2349460', season=None, episode=None, year=2014, watched=7)
+@plugin.route('/mark_as_watched/<video_type>/<title>/<imdb_id>/<season>/<episode>/<year>')
+def mark_as_watched(video_type, title, imdb_id, season, episode, year):
+    if video_type == 'movie':
+        __metaget__.change_watched(video_type, title, imdb_id, season=None, episode=None, year=year, watched=7)
+    elif video_type == 'episode':
+        __metaget__.change_watched(video_type, title, imdb_id, season=season, episode=episode, year=year, watched=7)
+
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
     #pass
@@ -2250,17 +2298,17 @@ def save_favourite(id, title, thumbnail, isplayable, category):
     #    showMessage('Database Error', 'Please contact software provider')
 
 
-@plugin.route('/remove_favourite/<id>/<title>/<category>')
-def remove_favourite(id, title, category):
-    statement = 'DELETE FROM favourites WHERE id=%s AND title=%s AND category=%s'
-    db = orm.connect(DB_DIR)
-    statement = statement.replace("%s", "?")
-    cursor = db.cursor()
-    cursor.execute(statement, (id, title, category))
-    db.commit()
-    db.close()
-    return xbmc.executebuiltin("XBMC.Container.Refresh()")
-
+# @plugin.route('/remove_favourite/<id>/<title>/<category>')
+# def remove_favourite(id, title, category):
+#     statement = 'DELETE FROM favourites WHERE id=%s AND title=%s AND category=%s'
+#     db = orm.connect(DB_DIR)
+#     statement = statement.replace("%s", "?")
+#     cursor = db.cursor()
+#     cursor.execute(statement, (id, title, category))
+#     db.commit()
+#     db.close()
+#     return xbmc.executebuiltin("XBMC.Container.Refresh()")
+#
 
 def sys_exit():
     hide_busy_dialog()
