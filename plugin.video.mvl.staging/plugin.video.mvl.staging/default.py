@@ -1020,7 +1020,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                       }]
 
 
-            src_list = ['firedrive', 'putlocker', 'novamov', 'movpod', 'filenuke', 'sockshare', 'movreel', 'mightyupload', 'promptfile', 'hugefile', 'billionupload', '180upload', 'lemupload', 'gorillavid']
+            src_list = ['firedrive', 'putlocker', 'movreel', 'promptfile', 'mightyupload', 'novamov', 'hugefile', 'billionupload', '180upload', 'lemupload', 'gorillavid']
 
             for urls in jsonObj:
                 src_order = 0
@@ -1099,6 +1099,19 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
         hide_busy_dialog()
 
 
+def getFullPath(path, url, useKiosk, userAgent):
+    profile = ""
+    # if useOwnProfile:
+    #     profile = '--user-data-dir="'+profileFolder+'" '
+    kiosk = ""
+    if useKiosk=="yes":
+        kiosk = '--kiosk '
+    if userAgent:
+        userAgent = '--user-agent="'+userAgent+'" '
+    return '"'+path+'" '+profile+userAgent+'--start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run '+kiosk+'"'+url+'"'
+
+import subprocess
+
 class CustomPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
         pass
@@ -1167,6 +1180,16 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             dialog.ok("Official Posters & Images", poster_text)
 
             resume_popup_window()
+
+        elif control == 29:
+            #facebook share
+            self.close()
+
+            # path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            path = 'am start -a android.intent.action.VIEW -d '
+            if os.path.exists(path):
+                # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
+                subprocess.Popen(path+" http://www.facebook.com", shell=False)
 
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
