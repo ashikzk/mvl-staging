@@ -1203,10 +1203,11 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             #facebook share
             self.close()
 
-            # path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
             if os.path.exists(path):
                 # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
-                subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
+                # subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
+                subprocess.check_call(path+" http://www.facebook.com", shell=False)
 
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
