@@ -626,7 +626,7 @@ def get_categories(id, page):
                             if last_release_group == '':
                                 #that means this is the first line of list
                                 items += [{
-                                              'label': '[COLOR FF2261B4]Estimated Release Date[/COLOR]',
+                                              'label': '[COLOR FFC41D67]Estimated Release Date[/COLOR]',
                                               'path': plugin.url_for('do_nothing', view_mode=0),
                                               'is_playable': False,
                                           }]
@@ -677,13 +677,17 @@ def get_categories(id, page):
 
                             dp_type = 'show'
 
-                            plugin.log.info('meta data-> %s' % mvl_meta)
+                            #plugin.log.info('meta data-> %s' % mvl_meta)
+
                             thumbnail_url = ''
                             try:
                                 if mvl_meta['cover_url']:
                                     thumbnail_url = mvl_meta['cover_url']
                             except:
                                 thumbnail_url = ''
+
+                            print "New Thumb"
+                            print thumbnail_url
 
                             fanart_url = ''
                             try:
@@ -1099,13 +1103,14 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
         pass
 
-    def setParams(self, trailer_id, source_url, resolved_url, title, video_id):
+    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id):
         self.trailer_id = trailer_id
         self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
         self.source_url = source_url
         self.resolved_url = resolved_url
-        self.title = title
+        self.title = title.strip()
         self.video_id = video_id
+        self.series_id = series_id
 
     def updateLabels(self):
         self.show()
@@ -1140,6 +1145,29 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             self.close()
             show_review(self.video_id)
 
+        elif control == 18:
+            #other viewing options
+            self.close()
+
+            purchase_dialog = CustomPurchaseOptions('Custom-PurchaseOptions.xml', os.path.dirname(os.path.realpath(__file__)))
+            purchase_dialog.showDialog()
+
+            resume_popup_window()
+
+        elif control == 28:
+            #official posters
+            self.close()
+
+            if self.trailer_id == "NONE":
+                poster_text = "Please visit http://thetvdb.com/?tab=seriesposters&id="+self.series_id+" for official posters and images"
+            else:
+                poster_text = "Please visit http://www.themoviedb.org/movie/"+self.series_id+"-"+self.title.replace(' ', '-')+"/backdrops for official posters and images"
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Official Posters & Images", poster_text)
+
+            resume_popup_window()
+
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
@@ -1162,6 +1190,25 @@ class CustomReviewPopup(xbmcgui.WindowXMLDialog):
             self.close()
             resume_popup_window()
 
+class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def showDialog(self):
+        self.show()
+        self.getControl(21).setLabel("Other Purchase/Viewing Options")
+        self.getControl(22).setLabel("Amazon.com (www.amazon.com/dvd)")
+        self.getControl(23).setLabel("Google Play (play.google.com/store/movies)")
+        self.getControl(24).setLabel("iTunes.com (www.apple.com/itunes/charts/movies)")
+        self.getControl(25).setLabel("Fandango (http://www.fandango.com)")
+        self.close()
+
+        self.doModal()
+
+    def onClick	(self, control):
+        if control == 10:
+            self.close()
+
 
 video_popup = None
 
@@ -1174,11 +1221,19 @@ def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_na
     elif parent_id == '3':
         video_popup = CustomPopup('Custom-VideoPopUp-TV.xml', os.path.dirname(os.path.realpath(__file__)))
 
+    series_id = "NONE"
     video_title = title
     if series_name != 'NONE':
         video_title = series_name + ' : ' + title
 
-    video_popup.setParams(trailer, url, resolved_url, video_title, video_id)
+        mvl_meta = create_meta('tvshow', series_name.encode('utf-8'), '', '')
+        series_id = mvl_meta['tvdb_id']
+    else:
+        mvl_meta = create_meta('movie', title, '', '')
+        series_id = mvl_meta['tmdb_id']
+
+
+    video_popup.setParams(trailer, url, resolved_url, video_title, video_id, series_id)
     video_popup.updateLabels()
 
     try:
@@ -1419,14 +1474,16 @@ def create_meta(video_type, title, year, thumb, sub_cat=None):
             episode_num = season_text[season_text.find('x')+1:]
             meta = __metaget__.get_episode_meta(episode_title, meta_temp['imdb_id'], season, episode_num)
             meta['series_name'] = series_name
+            #replace episode poster with series poster
+            meta['cover_url'] = meta_temp['cover_url']
 
-        if video_type == 'tvshow':
-            meta['cover_url'] = meta['banner_url']
+        #if video_type == 'tvshow':
+        #    meta['cover_url'] = meta['banner_url']
         if meta['cover_url'] in ('/images/noposter.jpg', ''):
             meta['cover_url'] = thumb
 
-        print 'Done TV'
-        print meta
+        #print 'Done TV'
+        #print meta
 
     except Exception, e:
         print e
