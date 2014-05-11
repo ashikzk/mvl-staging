@@ -1177,7 +1177,25 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
                 poster_text = "Please visit http://www.themoviedb.org/movie/"+self.series_id+"-"+self.title.replace(' ', '-')+"/backdrops for official posters and images"
 
             dialog = xbmcgui.Dialog()
-            dialog.ok("Official Posters & Images", poster_text)
+            dialog.ok("Posters & Images", poster_text)
+
+            resume_popup_window()
+
+        elif control == 15:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Watch Previews", "Please visit http://www.primetvseries.com to watch previews of your favorite shows")
+
+            resume_popup_window()
+
+        elif control == 16:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Read Reviews", "Please visit http://www.metacritic.com/tv to read reviews of your favorite shows")
 
             resume_popup_window()
 
@@ -1186,10 +1204,9 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             self.close()
 
             # path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-            path = 'am start -a android.intent.action.VIEW -d '
             if os.path.exists(path):
                 # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
-                subprocess.Popen(path+" http://www.facebook.com", shell=False)
+                subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
 
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
