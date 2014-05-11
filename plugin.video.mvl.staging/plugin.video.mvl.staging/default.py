@@ -43,8 +43,8 @@ import locale
 locale.getlocale=getlocale
 from datetime import datetime
 
-plugin_id = 'plugin.video.mvl.staging'
-skin_id = 'skin.mvl.staging'
+plugin_id = 'plugin.video.mvl'
+skin_id = 'skin.mvl'
 
 _MVL = Addon(plugin_id, sys.argv)
 plugin = Plugin()
@@ -1204,10 +1204,13 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
             self.close()
 
             path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            path64 = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
             if os.path.exists(path):
                 # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
                 # subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
                 subprocess.check_call(path+" http://www.facebook.com", shell=False)
+            elif os.path.exists(path64):
+                subprocess.check_call(path64+" http://www.facebook.com", shell=False)
 
 
 class CustomReviewPopup(xbmcgui.WindowXMLDialog):
