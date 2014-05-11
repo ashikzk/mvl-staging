@@ -43,8 +43,8 @@ import locale
 locale.getlocale=getlocale
 from datetime import datetime
 
-plugin_id = 'plugin.video.mvl'
-skin_id = 'skin.mvl'
+plugin_id = 'plugin.video.mvl.staging'
+skin_id = 'skin.mvl.staging'
 
 _MVL = Addon(plugin_id, sys.argv)
 plugin = Plugin()
