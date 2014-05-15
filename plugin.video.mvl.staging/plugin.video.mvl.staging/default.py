@@ -46,7 +46,6 @@ from datetime import datetime
 plugin_id = 'plugin.video.mvl.staging'
 skin_id = 'skin.mvl.staging'
 
-
 _MVL = Addon(plugin_id, sys.argv)
 plugin = Plugin()
 pluginhandle = int(sys.argv[1])
@@ -1375,6 +1374,7 @@ class MVLPlayer(xbmc.Player):
         xbmc.Player.__init__( self )
 
     def PlayVideo(self, url):
+
         self.play(url)
 
         try:
@@ -1436,37 +1436,45 @@ def play_video(url, resolved_url, title):
             #plugin.set_resolved_url(hostedurl)
             #play the resolved url manually, since we aren't using playable link
             playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
-            playlist.clear()
+            # playlist.clear()
 
             item_title = '[COLOR FFFFFFFF]{0}[/COLOR] | [COLOR FF777777]{1}[/COLOR]'.format(title, source_url)
             listitem = xbmcgui.ListItem(item_title)
 
             #check if this item already exists
-            #playlist_len = playlist.__len__()
-            #item_found = False
-            #item_index = 0
+            playlist_len = playlist.__len__()
+            item_found = False
+            item_index = 0
 
-            #for i in range(0, playlist_len):
-            #    #print item_title
-            #    #print playlist.__getitem__(i).getLabel()
-            #    #print '---------------'
-            #    #check to see if this item is already in the playlist
-            #    if playlist.__getitem__(i).getLabel() == item_title:
-            #        item_found = True
-            #        item_index = i
-            #        break
+            for i in range(0, playlist_len):
+                #print item_title
+                #print playlist.__getitem__(i).getLabel()
+                #print '---------------'
+                #check to see if this item is already in the playlist
+                if playlist.__getitem__(i).getLabel() == item_title:
+                    item_found = True
+                    item_index = i
+                    break
 
-            #if item_found:
-            #    #same filename already exists in playlist
+            if item_found:
+               #same filename already exists in playlist
             #    #remove same filename from playlist
             #    print playlist.remove(hostedurl)
-            #    print 'inside delete'
+                print 'found in playlist'
+                # pass
+            else:
+                playlist.add(url=hostedurl, listitem=listitem, index=0)
 
-
-            playlist.add(url=hostedurl, listitem=listitem, index=0)
+            #playlist.add(url=hostedurl, listitem=listitem, index=0)
 
             # xbmc.Player().play(playlist)
+
+            #print item_index
+            #xbmc.executebuiltin('Playlist.PlayOffset(video, {0})'.format(item_index))
+            #print 'Playlist.PlayOffset(video, {0})'.format(item_index)
+
             MVLPlayer().PlayVideo(playlist)
+
             #return None
         else:
             unplayable = True

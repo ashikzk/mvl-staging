@@ -22,16 +22,17 @@
 				<posy>300</posy>
 				<height>640</height>
 				<width>700</width>
-				<texture border="0,40,0,40">dialogs/ContextMenu.png</texture>
+				<!--<texture border="0,40,0,40">dialogs/ContextMenuLight.png</texture>-->
+				<texture border="0,40,0,40">dialogs/ContextMenuDark2.png</texture>
 			</control>
 		</control>
 
 
-      <control type="grouplist" id="9001" description="Custom Popup for video">
+      <control type="grouplist" id="9002" description="Title of Custom Popup for video">
         <posx>618</posx>
-        <posy>362</posy>
+        <posy>332</posy>
         <width>662</width>
-        <height>640</height>
+        <height>200</height>
         <itemgap>-2</itemgap>
         <onup>9001</onup>
         <ondown>9001</ondown>
@@ -43,8 +44,23 @@
             <width>660</width>
             <label>[COLOR FF235B9E][B]Please make your selection below[/B][/COLOR]</label>
             <textoffsetx>30</textoffsetx>
+            <shadowcolor></shadowcolor>
             <align>center</align>
         </control>
+    </control>
+
+
+      <control type="grouplist" id="9001" description="Custom Popup for video">
+        <posx>618</posx>
+        <posy>407</posy>
+        <width>662</width>
+        <height>640</height>
+        <itemgap>-2</itemgap>
+        <onup>9001</onup>
+        <ondown>9001</ondown>
+        <onleft>2</onleft>
+        <onright>9</onright>
+        <orientation>vertical</orientation>
 
         <control type="button" id="22" description="PlayItem">
           <label>[COLOR FFC41D67]Play Now[/COLOR]</label>
