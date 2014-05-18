@@ -43,8 +43,8 @@ import locale
 locale.getlocale=getlocale
 from datetime import datetime
 
-plugin_id = 'plugin.video.mvl.staging'
-skin_id = 'skin.mvl.staging'
+plugin_id = 'plugin.video.mvl'
+skin_id = 'skin.mvl'
 
 _MVL = Addon(plugin_id, sys.argv)
 plugin = Plugin()
@@ -337,12 +337,33 @@ def showMessage(heading, message):
     dialog = xbmcgui.Dialog()
     dialog.ok(heading, message)
 
+
+class CustomTermsPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def updateTermText(self, heading, term_text):
+        self.show()
+        self.getControl(1).setLabel(heading)
+        self.getControl(2).setText(term_text)
+
+        self.close()
+
+    def onClick	(self, control):
+        if control == 11:
+            self.close()
+            onClick_agree()
+        elif control == 10:
+            self.close()
+            onClick_disAgree()
+
+
+
 def check_condition():
     macAddress = usrsettings.getSetting('mac_address')
     global curr_page
     curr_page = 1
-    url = server_url + "/api/index.php/api/authentication_api/get_flag_status?username={0}&mac={1}".format(username,
-                                                                                                           macAddress)
+    url = server_url + "/api/index.php/api/authentication_api/get_flag_status?username={0}&mac={1}".format(username, macAddress)
     req = urllib2.Request(url)
     opener = urllib2.build_opener()
     # f = opener.open(req)
@@ -359,13 +380,17 @@ def check_condition():
         f = open(tc_path)
         text = f.read()
 
-        dialog = xbmcgui.Dialog()
-        agree_ret = dialog.yesno(heading, text, yeslabel='Agree', nolabel='Disagree')
+        #dialog = xbmcgui.Dialog()
+        #agree_ret = dialog.yesno(heading, text, yeslabel='Agree', nolabel='Disagree')
 
-        if agree_ret:
-            onClick_agree()
-        else:
-            onClick_disAgree()
+        terms_popup = CustomTermsPopup('Custom-DialogTerms&Condition.xml', os.path.dirname(os.path.realpath(__file__)))
+        terms_popup.updateTermText(heading, text)
+        terms_popup.doModal()
+
+        #if agree_ret:
+        #    onClick_agree()
+        #else:
+        #    onClick_disAgree()
 
     elif content == 'true':
         global isAgree
@@ -1395,6 +1420,14 @@ class MVLPlayer(xbmc.Player):
         # print "PLAYBACK STOPPED"
         resume_popup_window()
 
+from resources import playbackengine
+
+def WatchedCallback():
+    print('- - -' +'Video completely watched.')
+    print "Video dekhe felsi re!"
+
+
+
 @plugin.route('/play_video/<url>/<resolved_url>/<title>')
 def play_video(url, resolved_url, title):
     global mvl_view_mode
@@ -1434,52 +1467,79 @@ def play_video(url, resolved_url, title):
 
             hide_busy_dialog()
             #plugin.set_resolved_url(hostedurl)
-            #play the resolved url manually, since we aren't using playable link
-            playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
-            # playlist.clear()
 
+
+            ##play the resolved url manually, since we aren't using playable link
+            #playlist = xbmc.PlayList( xbmc.PLAYLIST_VIDEO )
+            ## playlist.clear()
+            #
+            #item_title = '[COLOR FFFFFFFF]{0}[/COLOR] | [COLOR FF777777]{1}[/COLOR]'.format(title, source_url)
+            #listitem = xbmcgui.ListItem(item_title)
+            #
+            ##check if this item already exists
+            #playlist_len = playlist.__len__()
+            #item_found = False
+            #item_index = 0
+            #
+            #for i in range(0, playlist_len):
+            #    #print item_title
+            #    #print playlist.__getitem__(i).getLabel()
+            #    #print '---------------'
+            #    #check to see if this item is already in the playlist
+            #    if playlist.__getitem__(i).getLabel() == item_title:
+            #        item_found = True
+            #        item_index = i
+            #        break
+            #
+            #if item_found:
+            #   #same filename already exists in playlist
+            ##    #remove same filename from playlist
+            ##    print playlist.remove(hostedurl)
+            #    print 'found in playlist'
+            #    # pass
+            #else:
+            #    playlist.add(url=hostedurl, listitem=listitem, index=0)
+            #
+            ##playlist.add(url=hostedurl, listitem=listitem, index=0)
+            #
+            ## xbmc.Player().play(playlist)
+            #
+            ##print item_index
+            ##xbmc.executebuiltin('Playlist.PlayOffset(video, {0})'.format(item_index))
+            ##print 'Playlist.PlayOffset(video, {0})'.format(item_index)
+            #
+            #MVLPlayer().PlayVideo(playlist)
+
+
+######################
+######################
+
+
+            playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+            playlist.clear()
             item_title = '[COLOR FFFFFFFF]{0}[/COLOR] | [COLOR FF777777]{1}[/COLOR]'.format(title, source_url)
             listitem = xbmcgui.ListItem(item_title)
+            playlist.add(url=hostedurl, listitem=listitem)
 
-            #check if this item already exists
-            playlist_len = playlist.__len__()
-            item_found = False
-            item_index = 0
+            player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
+                                    season='', episode='', year='2014', watch_percent=0.9,
+                                    watchedCallback=WatchedCallback)
 
-            for i in range(0, playlist_len):
-                #print item_title
-                #print playlist.__getitem__(i).getLabel()
-                #print '---------------'
-                #check to see if this item is already in the playlist
-                if playlist.__getitem__(i).getLabel() == item_title:
-                    item_found = True
-                    item_index = i
-                    break
+            player.play(playlist)
+            while player._playbackLock.isSet():
+                print('- - -' +'Playback lock set. Sleeping for 250.')
+                xbmc.sleep(250)
 
-            if item_found:
-               #same filename already exists in playlist
-            #    #remove same filename from playlist
-            #    print playlist.remove(hostedurl)
-                print 'found in playlist'
-                # pass
-            else:
-                playlist.add(url=hostedurl, listitem=listitem, index=0)
-
-            #playlist.add(url=hostedurl, listitem=listitem, index=0)
-
-            # xbmc.Player().play(playlist)
-
-            #print item_index
-            #xbmc.executebuiltin('Playlist.PlayOffset(video, {0})'.format(item_index))
-            #print 'Playlist.PlayOffset(video, {0})'.format(item_index)
-
-            MVLPlayer().PlayVideo(playlist)
+            #if we are here, it means playback has either stopped or finished
+            #show popup again
+            resume_popup_window()
 
             #return None
         else:
             unplayable = True
     except Exception, e:
         unplayable = True
+        print 'muri khai...'
         print e
 
     if unplayable:

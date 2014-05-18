@@ -18,12 +18,13 @@
 				<effect type="fade" start="100" end="0" time="100" />
 			</animation>
 			<control type="image" description="Menu BG">
-				<posx>600</posx>
+				<posx>595</posx>
 				<posy>300</posy>
 				<height>640</height>
 				<width>700</width>
 				<!--<texture border="0,40,0,40">dialogs/ContextMenuLight.png</texture>-->
-				<texture border="0,40,0,40">dialogs/ContextMenuDark2.png</texture>
+				<texture border="0,40,0,40">dialogs/ContextMenu.png</texture>
+				<!--<texture border="0,40,0,40">dialogs/ContextMenuDark2.png</texture>-->
 			</control>
 		</control>
 
