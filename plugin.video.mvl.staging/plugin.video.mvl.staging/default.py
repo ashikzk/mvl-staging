@@ -43,8 +43,8 @@ import locale
 locale.getlocale=getlocale
 from datetime import datetime
 
-plugin_id = 'plugin.video.mvl'
-skin_id = 'skin.mvl'
+plugin_id = 'plugin.video.mvl.staging'
+skin_id = 'skin.mvl.staging'
 
 _MVL = Addon(plugin_id, sys.argv)
 plugin = Plugin()
@@ -1150,6 +1150,11 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
         self.video_id = video_id
         self.series_id = series_id
 
+        if trailer_id == 'NONE':
+            self.video_type = 'episode'
+        else:
+            self.video_type = 'movie'
+
     def updateLabels(self):
         self.show()
         self.getControl(20).setLabel(self.source_url)
@@ -1168,12 +1173,12 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
                 showMessage('Error', 'No trailer found')
                 resume_popup_window()
             else:
-                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer')
+                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type)
 
 
         elif control == 22:
             self.close()
-            play_video(self.source_url, self.resolved_url, self.title)
+            play_video(self.source_url, self.resolved_url, self.title, self.video_type)
 
         elif control == 23:
             #exit
@@ -1394,42 +1399,44 @@ def resume_popup_window():
         pass
 
 
-class MVLPlayer(xbmc.Player):
-    def __init__( self, *args, **kwargs ):
-        xbmc.Player.__init__( self )
-
-    def PlayVideo(self, url):
-
-        self.play(url)
-
-        try:
-            while self.isPlaying():
-                xbmc.sleep(1000)
-        except:
-            pass
-
-    def onPlayBackStarted(self):
-        # print "PLAYBACK STARTED"
-        pass
-
-    def onPlayBackEnded(self):
-        # print "PLAYBACK ENDED"
-        resume_popup_window()
-
-    def onPlayBackStopped(self):
-        # print "PLAYBACK STOPPED"
-        resume_popup_window()
+# class MVLPlayer(xbmc.Player):
+#     def __init__( self, *args, **kwargs ):
+#         xbmc.Player.__init__( self )
+#
+#     def PlayVideo(self, url):
+#
+#         self.play(url)
+#
+#         try:
+#             while self.isPlaying():
+#                 xbmc.sleep(1000)
+#         except:
+#             pass
+#
+#     def onPlayBackStarted(self):
+#         # print "PLAYBACK STARTED"
+#         pass
+#
+#     def onPlayBackEnded(self):
+#         # print "PLAYBACK ENDED"
+#         resume_popup_window()
+#
+#     def onPlayBackStopped(self):
+#         # print "PLAYBACK STOPPED"
+#         resume_popup_window()
 
 from resources import playbackengine
 
-def WatchedCallback():
+def WatchedCallbackwithParams(video_type, title, imdb_id, season, episode, year):
     print('- - -' +'Video completely watched.')
-    print "Video dekhe felsi re!"
+
+    if video_type == 'movie':
+        __metaget__.change_watched(video_type, title, imdb_id, season=None, episode=None, year=year, watched=7)
+        # xbmc.executebuiltin("XBMC.Container.Refresh")
 
 
 
-@plugin.route('/play_video/<url>/<resolved_url>/<title>')
-def play_video(url, resolved_url, title):
+def play_video(url, resolved_url, title, video_type):
     global mvl_view_mode
 
     # if check_internet():
@@ -1512,6 +1519,13 @@ def play_video(url, resolved_url, title):
 
 
 ######################
+            if video_type == 'movie':
+                mvl_meta = create_meta('movie', title, '', '')
+            else:
+            #     mvl_meta = create_meta('movie', title, '', '')
+                mvl_meta = {'year': ''}
+
+
 ######################
 
 
@@ -1521,9 +1535,10 @@ def play_video(url, resolved_url, title):
             listitem = xbmcgui.ListItem(item_title)
             playlist.add(url=hostedurl, listitem=listitem)
 
+
             player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
-                                    season='', episode='', year='2014', watch_percent=0.9,
-                                    watchedCallback=WatchedCallback)
+                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.9,
+                                    watchedCallbackwithParams=WatchedCallbackwithParams)
 
             player.play(playlist)
             while player._playbackLock.isSet():
@@ -1539,7 +1554,6 @@ def play_video(url, resolved_url, title):
             unplayable = True
     except Exception, e:
         unplayable = True
-        print 'muri khai...'
         print e
 
     if unplayable:
