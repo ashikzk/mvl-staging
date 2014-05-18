@@ -22,10 +22,10 @@ import xbmc
 import xbmcvfs
 import xbmcgui
 
-addon = Addon('plugin.video.mvl')
+addon = Addon('plugin.video.mvl.staging')
 addon_path = addon.get_path()
 
-default_path = 'special://profile/addon_data/plugin.video.mvl/'
+default_path = 'special://profile/addon_data/plugin.video.mvl.staging/'
 db_path = os.path.join(xbmc.translatePath("special://database"), 'myvideolibrary')
 
 
