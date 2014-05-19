@@ -34,7 +34,11 @@ from metahandler import metahandlers
 from metahandler import metacontainers
 
 from operator import itemgetter
-from threading import Thread
+#from threading import Thread
+
+import resources._common as common
+from resources import playbackengine
+
 
 #Patch Locale for android devices
 def getlocale(*args, **kwargs):
@@ -43,20 +47,24 @@ import locale
 locale.getlocale=getlocale
 from datetime import datetime
 
-plugin_id = 'plugin.video.mvl.staging'
-skin_id = 'skin.mvl.staging'
 
-_MVL = Addon(plugin_id, sys.argv)
+_MVL = Addon(common.plugin_id, sys.argv)
 plugin = Plugin()
 pluginhandle = int(sys.argv[1])
-usrsettings = xbmcaddon.Addon(id=plugin_id)
-page_limit = usrsettings.getSetting('page_limit_xbmc')
+
+usrsettings = xbmcaddon.Addon(id=common.plugin_id)
+#page_limit = usrsettings.getSetting('page_limit_xbmc')
 # authentication = plugin.get_storage('authentication', TTL=1)
 # authentication['logged_in'] = 'false'
-username = usrsettings.getSetting('username_xbmc')
-activation_key = usrsettings.getSetting('activationkey_xbmc')
+#username = usrsettings.getSetting('username_xbmc')
+#activation_key = usrsettings.getSetting('activationkey_xbmc')
+page_limit = 30
+username = ''
+activation_key = ''
 usrsettings.setSetting(id='mac_address', value=usrsettings.getSetting('mac_address'))
+
 THEME_PATH = os.path.join(_MVL.get_path(), 'art')
+
 # server_url = 'http://staging.redbuffer.net/xbmc'
 # server_url = 'http://localhost/xbmc'
 server_url = 'http://config.myvideolibrary.com'
@@ -70,7 +78,7 @@ __metaget__ = metahandlers.MetaData(preparezip=PREPARE_ZIP)
 # except:
 # import storageserverdummy as StorageServer
 # #cache = StorageServer.StorageServer("mvl_storage_data", 24) # (Your plugin name, Cache time in hours)
-# cache = StorageServer.StorageServer("plugin://"+plugin_id+"/", 24)
+# cache = StorageServer.StorageServer("plugin://"+common.plugin_id+"/", 24)
 # cache.delete("%")
 
 try:
@@ -148,7 +156,7 @@ def index():
             file.write('<showparentdiritems>false</showparentdiritems>\n')
             file.write('</filelists>\n')
             file.write('<lookandfeel>\n')
-            file.write('<skin>'+skin_id+'</skin>\n')
+            file.write('<skin>'+common.skin_id+'</skin>\n')
             file.write('</lookandfeel>\n')
             file.write('</advancedsettings>\n')
             file.close()
@@ -165,7 +173,7 @@ def index():
             file.write("<F5>Skin.ToggleSetting('test')</F5>\n")
             file.write("<F6>Skin.ToggleSetting('test')</F6>\n")
             file.write("<backslash>Skin.ToggleSetting('test')</backslash>\n")
-            file.write("<backspace>XBMC.RunScript(special://home\\addons\\"+plugin_id+"\\script_backhandler.py)</backspace>\n")
+            file.write("<backspace>XBMC.RunScript(special://home\\addons\\"+common.plugin_id+"\\script_backhandler.py)</backspace>\n")
             file.write('</keyboard>\n')
             file.write('</global>\n')
             file.write('</keymap>')
@@ -336,27 +344,6 @@ def onClick_agree():
 def showMessage(heading, message):
     dialog = xbmcgui.Dialog()
     dialog.ok(heading, message)
-
-
-class CustomTermsPopup(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
-        pass
-
-    def updateTermText(self, heading, term_text):
-        self.show()
-        self.getControl(1).setLabel(heading)
-        self.getControl(2).setText(term_text)
-
-        self.close()
-
-    def onClick	(self, control):
-        if control == 11:
-            self.close()
-            onClick_agree()
-        elif control == 10:
-            self.close()
-            onClick_disAgree()
-
 
 
 def check_condition():
@@ -1135,155 +1122,6 @@ def getFullPath(path, url, useKiosk, userAgent):
         userAgent = '--user-agent="'+userAgent+'" '
     return '"'+path+'" '+profile+userAgent+'--start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run '+kiosk+'"'+url+'"'
 
-import subprocess
-
-class CustomPopup(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
-        pass
-
-    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id):
-        self.trailer_id = trailer_id
-        self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
-        self.source_url = source_url
-        self.resolved_url = resolved_url
-        self.title = title.strip()
-        self.video_id = video_id
-        self.series_id = series_id
-
-        if trailer_id == 'NONE':
-            self.video_type = 'episode'
-        else:
-            self.video_type = 'movie'
-
-    def updateLabels(self):
-        self.show()
-        self.getControl(20).setLabel(self.source_url)
-        self.close()
-
-    def onClick	(self, control):
-        if control == 20:
-            #show source URL
-            # showMessage('Msg', self.trailer_url)
-            pass
-        elif control == 21:
-            #play trailer
-            self.close()
-
-            if self.trailer_id == 'NONE':
-                showMessage('Error', 'No trailer found')
-                resume_popup_window()
-            else:
-                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type)
-
-
-        elif control == 22:
-            self.close()
-            play_video(self.source_url, self.resolved_url, self.title, self.video_type)
-
-        elif control == 23:
-            #exit
-            self.close()
-
-        elif control == 24:
-            self.close()
-            show_review(self.video_id)
-
-        elif control == 18:
-            #other viewing options
-            self.close()
-
-            purchase_dialog = CustomPurchaseOptions('Custom-PurchaseOptions.xml', os.path.dirname(os.path.realpath(__file__)))
-            purchase_dialog.showDialog()
-
-            resume_popup_window()
-
-        elif control == 28:
-            #official posters
-            self.close()
-
-            if self.trailer_id == "NONE":
-                poster_text = "Please visit http://thetvdb.com/?tab=seriesposters&id="+self.series_id+" for official posters and images"
-            else:
-                poster_text = "Please visit http://www.themoviedb.org/movie/"+self.series_id+"-"+self.title.replace(' ', '-')+"/backdrops for official posters and images"
-
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Posters & Images", poster_text)
-
-            resume_popup_window()
-
-        elif control == 15:
-            #Watch Previews
-            self.close()
-
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Watch Previews", "Please visit http://www.primetvseries.com to watch previews of your favorite shows")
-
-            resume_popup_window()
-
-        elif control == 16:
-            #Watch Previews
-            self.close()
-
-            dialog = xbmcgui.Dialog()
-            dialog.ok("Read Reviews", "Please visit http://www.metacritic.com/tv to read reviews of your favorite shows")
-
-            resume_popup_window()
-
-        elif control == 29:
-            #facebook share
-            self.close()
-
-            path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-            path64 = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-            if os.path.exists(path):
-                # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
-                # subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
-                subprocess.check_call(path+" http://www.facebook.com", shell=False)
-            elif os.path.exists(path64):
-                subprocess.check_call(path64+" http://www.facebook.com", shell=False)
-
-
-class CustomReviewPopup(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
-        pass
-
-    def setParams(self, review_url):
-        self.review_url = review_url
-
-    def updateReviewText(self, review, critic_name, review_publish_date, heading):
-        self.show()
-        #self.getControl(1).setLabel(heading+'\n[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
-        self.getControl(1).setLabel(heading)
-        self.getControl(4).setLabel('[COLOR FF888888] By '+critic_name+' ('+review_publish_date+', The New York Times) [/COLOR]')
-        self.getControl(2).setText(review)
-
-        self.close()
-
-    def onClick	(self, control):
-        if control == 11:
-            self.close()
-            resume_popup_window()
-
-class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
-        pass
-
-    def showDialog(self):
-        self.show()
-        self.getControl(21).setLabel("Other Purchase/Viewing Options")
-        self.getControl(22).setLabel("Amazon.com (www.amazon.com/dvd)")
-        self.getControl(23).setLabel("Google Play (play.google.com/store/movies)")
-        self.getControl(24).setLabel("iTunes.com (www.apple.com/itunes/charts/movies)")
-        self.getControl(25).setLabel("Fandango (http://www.fandango.com)")
-        self.close()
-
-        self.doModal()
-
-    def onClick	(self, control):
-        if control == 10:
-            self.close()
-
-
 video_popup = None
 
 @plugin.route('/show_popup/<url>/<resolved_url>/<title>/<trailer>/<parent_id>/<video_id>/<series_name>')
@@ -1369,8 +1207,6 @@ def show_review(video_id):
     hide_busy_dialog()
     exit()
 
-
-
 def resume_popup_window():
 
     try:
@@ -1399,33 +1235,6 @@ def resume_popup_window():
         pass
 
 
-# class MVLPlayer(xbmc.Player):
-#     def __init__( self, *args, **kwargs ):
-#         xbmc.Player.__init__( self )
-#
-#     def PlayVideo(self, url):
-#
-#         self.play(url)
-#
-#         try:
-#             while self.isPlaying():
-#                 xbmc.sleep(1000)
-#         except:
-#             pass
-#
-#     def onPlayBackStarted(self):
-#         # print "PLAYBACK STARTED"
-#         pass
-#
-#     def onPlayBackEnded(self):
-#         # print "PLAYBACK ENDED"
-#         resume_popup_window()
-#
-#     def onPlayBackStopped(self):
-#         # print "PLAYBACK STOPPED"
-#         resume_popup_window()
-
-from resources import playbackengine
 
 def WatchedCallbackwithParams(video_type, title, imdb_id, season, episode, year):
     print('- - -' +'Video completely watched.')
@@ -1433,8 +1242,6 @@ def WatchedCallbackwithParams(video_type, title, imdb_id, season, episode, year)
     if video_type == 'movie':
         __metaget__.change_watched(video_type, title, imdb_id, season=None, episode=None, year=year, watched=7)
         # xbmc.executebuiltin("XBMC.Container.Refresh")
-
-
 
 def play_video(url, resolved_url, title, video_type):
     global mvl_view_mode
@@ -1631,7 +1438,6 @@ def get_trailer_url(mvl_meta):
 
     return trailer
 
-
 def login_check():
     return True
 
@@ -1691,7 +1497,7 @@ def check_update():
         mvl_video_version = addon.attributes['version'].value
 
         #mvl skin
-        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', skin_id, 'addon.xml')
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', common.skin_id, 'addon.xml')
         xmldoc = minidom.parse(file_path)
         addon = xmldoc.getElementsByTagName('addon')[0]
         mvl_skin_version = addon.attributes['version'].value
@@ -1712,12 +1518,9 @@ def check_update():
 
     pass
 
-
 def run_update():
     file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'script_update.py')
     xbmc.executebuiltin("RunScript("+file_path+")")
-
-
 
 @plugin.route('/search/<category>/')
 def search(category):
@@ -1995,9 +1798,6 @@ def search(category):
         dialog_msg()
         hide_busy_dialog()
 
-
-
-
 @plugin.route('/azlisting/<category>/')
 def azlisting(category):
     global mvl_view_mode
@@ -2029,7 +1829,6 @@ def azlisting(category):
         mvl_view_mode = 59
         dialog_msg()
         hide_busy_dialog()
-
 
 @plugin.route('/get_azlist/<key>/<page>/<category>/')
 def get_azlist(key, page, category):
@@ -2332,7 +2131,6 @@ def get_azlist(key, page, category):
         dialog_msg()
         hide_busy_dialog()
 
-
 @plugin.route('/mostpopular/<page>/<category>/')
 def mostpopular(page, category):
     global mvl_view_mode
@@ -2441,7 +2239,6 @@ def mostpopular(page, category):
         dialog_msg()
         hide_busy_dialog()
 
-
 def init_database():
     plugin.log.info('Building My Video Library Database')
     if not xbmcvfs.exists(os.path.dirname(DB_DIR)):
@@ -2451,7 +2248,6 @@ def init_database():
         'CREATE TABLE IF NOT EXISTS favourites (id, title, thumbnail, isplayable, category, PRIMARY KEY (id, title, category))')
     db.commit()
     db.close()
-
 
 @plugin.route('/mark_as_watched/<video_type>/<title>/<imdb_id>/<season>/<episode>/<year>')
 def mark_as_watched(video_type, title, imdb_id, season, episode, year):
@@ -2481,7 +2277,6 @@ def mark_as_watched(video_type, title, imdb_id, season, episode, year):
     #    # xbmc.executebuiltin('Notification(Database Error, Please contact software provider,5000,/script.hellow.world.png)')
     #    showMessage('Database Error', 'Please contact software provider')
 
-
 # @plugin.route('/remove_favourite/<id>/<title>/<category>')
 # def remove_favourite(id, title, category):
 #     statement = 'DELETE FROM favourites WHERE id=%s AND title=%s AND category=%s'
@@ -2498,7 +2293,6 @@ def sys_exit():
     hide_busy_dialog()
     # plugin.finish(succeeded=True)
     xbmc.executebuiltin("XBMC.ActivateWindow(Home)")
-
 
 @plugin.route('/get_favourites/<category>/')
 def get_favourites(category):
@@ -2543,6 +2337,324 @@ def get_favourites(category):
     db.close()
     hide_busy_dialog()
     return items
+
+
+class CustomTermsPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def updateTermText(self, heading, term_text):
+        self.show()
+        self.getControl(1).setLabel(heading)
+        self.getControl(2).setText(term_text)
+
+        self.close()
+
+    def onClick	(self, control):
+        if control == 11:
+            self.close()
+            onClick_agree()
+        elif control == 10:
+            self.close()
+            onClick_disAgree()
+
+
+
+class CustomPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id):
+        self.trailer_id = trailer_id
+        self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
+        self.source_url = source_url
+        self.resolved_url = resolved_url
+        self.title = title.strip()
+        self.video_id = video_id
+        self.series_id = series_id
+
+        if trailer_id == 'NONE':
+            self.video_type = 'episode'
+        else:
+            self.video_type = 'movie'
+
+    def updateLabels(self):
+        self.show()
+        self.getControl(20).setLabel(self.source_url)
+        self.close()
+
+    def onClick	(self, control):
+        if control == 20:
+            #show source URL
+            # showMessage('Msg', self.trailer_url)
+            pass
+        elif control == 21:
+            #play trailer
+            self.close()
+
+            if self.trailer_id == 'NONE':
+                showMessage('Error', 'No trailer found')
+                resume_popup_window()
+            else:
+                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type)
+
+
+        elif control == 22:
+            self.close()
+            play_video(self.source_url, self.resolved_url, self.title, self.video_type)
+
+        elif control == 23:
+            #exit
+            self.close()
+
+        elif control == 24:
+            self.close()
+            show_review(self.video_id)
+
+        elif control == 18:
+            #other viewing options
+            self.close()
+
+            purchase_dialog = CustomPurchaseOptions('Custom-PurchaseOptions.xml', os.path.dirname(os.path.realpath(__file__)))
+            purchase_dialog.showDialog()
+
+            resume_popup_window()
+
+        elif control == 28:
+            #official posters
+            self.close()
+
+            if self.trailer_id == "NONE":
+                poster_text = "Please visit http://thetvdb.com/?tab=seriesposters&id="+self.series_id+" for official posters and images"
+            else:
+                poster_text = "Please visit http://www.themoviedb.org/movie/"+self.series_id+"-"+self.title.replace(' ', '-')+"/backdrops for official posters and images"
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Posters & Images", poster_text)
+
+            resume_popup_window()
+
+        elif control == 15:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Watch Previews", "Please visit http://www.primetvseries.com to watch previews of your favorite shows")
+
+            resume_popup_window()
+
+        elif control == 16:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Read Reviews", "Please visit http://www.metacritic.com/tv to read reviews of your favorite shows")
+
+            resume_popup_window()
+
+        elif control == 29:
+            #facebook share
+            #self.close()
+            pass
+
+            #path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            #path64 = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+            #if os.path.exists(path):
+            #    # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
+            #    # subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
+            #    subprocess.check_call(path+" http://www.facebook.com", shell=False)
+            #elif os.path.exists(path64):
+            #    subprocess.check_call(path64+" http://www.facebook.com", shell=False)
+
+
+class CustomReviewPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def setParams(self, review_url):
+        self.review_url = review_url
+
+    def updateReviewText(self, review, critic_name, review_publish_date, heading):
+        self.show()
+        #self.getControl(1).setLabel(heading+'\n[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
+        self.getControl(1).setLabel(heading)
+        self.getControl(4).setLabel('[COLOR FF888888] By '+critic_name+' ('+review_publish_date+', The New York Times) [/COLOR]')
+        self.getControl(2).setText(review)
+
+        self.close()
+
+    def onClick	(self, control):
+        if control == 11:
+            self.close()
+            resume_popup_window()
+
+class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def showDialog(self):
+        self.show()
+        self.getControl(21).setLabel("Other Purchase/Viewing Options")
+        self.getControl(22).setLabel("Amazon.com (www.amazon.com/dvd)")
+        self.getControl(23).setLabel("Google Play (play.google.com/store/movies)")
+        self.getControl(24).setLabel("iTunes.com (www.apple.com/itunes/charts/movies)")
+        self.getControl(25).setLabel("Fandango (http://www.fandango.com)")
+        self.close()
+
+        self.doModal()
+
+    def onClick	(self, control):
+        if control == 10:
+            self.close()
+
+
+
+class CustomPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id):
+        self.trailer_id = trailer_id
+        self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
+        self.source_url = source_url
+        self.resolved_url = resolved_url
+        self.title = title.strip()
+        self.video_id = video_id
+        self.series_id = series_id
+
+        if trailer_id == 'NONE':
+            self.video_type = 'episode'
+        else:
+            self.video_type = 'movie'
+
+    def updateLabels(self):
+        self.show()
+        self.getControl(20).setLabel(self.source_url)
+        self.close()
+
+    def onClick	(self, control):
+        if control == 20:
+            #show source URL
+            # showMessage('Msg', self.trailer_url)
+            pass
+        elif control == 21:
+            #play trailer
+            self.close()
+
+            if self.trailer_id == 'NONE':
+                showMessage('Error', 'No trailer found')
+                resume_popup_window()
+            else:
+                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type)
+
+
+        elif control == 22:
+            self.close()
+            play_video(self.source_url, self.resolved_url, self.title, self.video_type)
+
+        elif control == 23:
+            #exit
+            self.close()
+
+        elif control == 24:
+            self.close()
+            show_review(self.video_id)
+
+        elif control == 18:
+            #other viewing options
+            self.close()
+
+            purchase_dialog = CustomPurchaseOptions('Custom-PurchaseOptions.xml', os.path.dirname(os.path.realpath(__file__)))
+            purchase_dialog.showDialog()
+
+            resume_popup_window()
+
+        elif control == 28:
+            #official posters
+            self.close()
+
+            if self.trailer_id == "NONE":
+                poster_text = "Please visit http://thetvdb.com/?tab=seriesposters&id="+self.series_id+" for official posters and images"
+            else:
+                poster_text = "Please visit http://www.themoviedb.org/movie/"+self.series_id+"-"+self.title.replace(' ', '-')+"/backdrops for official posters and images"
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Posters & Images", poster_text)
+
+            resume_popup_window()
+
+        elif control == 15:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Watch Previews", "Please visit http://www.primetvseries.com to watch previews of your favorite shows")
+
+            resume_popup_window()
+
+        elif control == 16:
+            #Watch Previews
+            self.close()
+
+            dialog = xbmcgui.Dialog()
+            dialog.ok("Read Reviews", "Please visit http://www.metacritic.com/tv to read reviews of your favorite shows")
+
+            resume_popup_window()
+
+        elif control == 29:
+            #facebook share
+            self.close()
+
+            path = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            path64 = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+            if os.path.exists(path):
+                # fullUrl = getFullPath(path, "http://www.facebook.com", "", "")
+                # subprocess.check_call("am start -a android.intent.action.VIEW -d http://www.facebook.com", shell=False)
+                subprocess.check_call(path+" http://www.facebook.com", shell=False)
+            elif os.path.exists(path64):
+                subprocess.check_call(path64+" http://www.facebook.com", shell=False)
+
+
+class CustomReviewPopup(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def setParams(self, review_url):
+        self.review_url = review_url
+
+    def updateReviewText(self, review, critic_name, review_publish_date, heading):
+        self.show()
+        #self.getControl(1).setLabel(heading+'\n[COLOR FF888888] By '+critic_name+' ('+review_publish_date+') [/COLOR]')
+        self.getControl(1).setLabel(heading)
+        self.getControl(4).setLabel('[COLOR FF888888] By '+critic_name+' ('+review_publish_date+', The New York Times) [/COLOR]')
+        self.getControl(2).setText(review)
+
+        self.close()
+
+    def onClick	(self, control):
+        if control == 11:
+            self.close()
+            resume_popup_window()
+
+class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
+    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
+        pass
+
+    def showDialog(self):
+        self.show()
+        self.getControl(21).setLabel("Other Purchase/Viewing Options")
+        self.getControl(22).setLabel("Amazon.com (www.amazon.com/dvd)")
+        self.getControl(23).setLabel("Google Play (play.google.com/store/movies)")
+        self.getControl(24).setLabel("iTunes.com (www.apple.com/itunes/charts/movies)")
+        self.getControl(25).setLabel("Fandango (http://www.fandango.com)")
+        self.close()
+
+        self.doModal()
+
+    def onClick	(self, control):
+        if control == 10:
+            self.close()
+
 
 
 if __name__ == '__main__':
