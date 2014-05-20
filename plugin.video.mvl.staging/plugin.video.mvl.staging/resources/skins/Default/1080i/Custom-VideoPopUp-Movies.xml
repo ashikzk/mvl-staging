@@ -64,10 +64,13 @@
         <orientation>vertical</orientation>
 
         <control type="button" id="22" description="PlayItem">
-          <label>[COLOR FFC41D67]Play Now[/COLOR]</label>
+          <!--<label>[COLOR FFC41D67]Play Now[/COLOR]</label>-->
           <width>660</width>
+          <!--<width>227</width>-->
           <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
+          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_playnow.png</texturenofocus>
+          <texturefocus colordiffuse="FFFFAAFF">popup/btn_playnow.png</texturefocus>
         </control>
 
         <control type="button" id="21" description="WatchTrailer">
