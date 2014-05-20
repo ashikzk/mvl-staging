@@ -22,8 +22,8 @@ import xbmc
 import xbmcvfs
 import xbmcgui
 
-plugin_id = 'plugin.video.mvl'
-skin_id = 'skin.mvl'
+plugin_id = 'plugin.video.mvl.staging'
+skin_id = 'skin.mvl.staging'
 
 addon = Addon(plugin_id)
 addon_path = addon.get_path()
