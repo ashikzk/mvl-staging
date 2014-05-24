@@ -1060,7 +1060,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             count = 0
             sd_count = 0
             for urls in jsonObj:
-                #if parent_id == '1' and urls['resolved_URL'] == 'NONE':
+                # if parent_id == '1' and urls['resolved_URL'] == 'NONE':
+                # if urls['resolved_URL'] == 'NONE':
                 #    continue
 
                 source_quality = ''
@@ -1353,7 +1354,7 @@ def play_video(url, resolved_url, title, video_type):
 
 
             player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
-                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.01,
+                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.5,
                                     watchedCallbackwithParams=WatchedCallbackwithParams)
 
             player.play(playlist)
