@@ -4,9 +4,11 @@ if 'do_nothing' in sys.argv[0]:
     #no need to do anything!
     exit()
 
-#hide any existing loading and show system busy dialog to freeze the screen
+
+#hide any existing loading and show system busy dialog to freeze the screen.
 xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 xbmc.executebuiltin( "ActivateWindow(busydialog)" )
+
 #save lockdown state to a file for future reference
 import os
 file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'screen_lock.dat')
@@ -811,7 +813,7 @@ def get_categories(id, page):
                         mvl_img = thumbnail_url
                         series_name = 'NONE'
 
-                        watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
+                        watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': '0'}
 
                         if categories['top_level_parent'] == '1':
                             mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
@@ -824,6 +826,10 @@ def get_categories(id, page):
                             watch_info['season'] = mvl_meta['season']
                             watch_info['episode'] = mvl_meta['episode']
                             watch_info['year'] = mvl_meta['premiered'][:4]
+
+                            if watch_info['year'] == '':
+                                watch_info['year'] = 0
+
 
                             if 'series_name' in mvl_meta:
                                 series_name = mvl_meta['series_name'].strip()
@@ -859,6 +865,9 @@ def get_categories(id, page):
                         except:
                             mvl_plot = categories['synopsis'].encode('utf-8')
 
+                        watched_state = 'Watched'
+                        if mvl_meta['playcount'] > 0:
+                            watched_state = 'Unwatched'
 
                         items += [{
                                       'thumbnail': thumbnail_url,
@@ -886,8 +895,8 @@ def get_categories(id, page):
                                                              parent_id=categories['top_level_parent'], series_name=series_name),
                                       'is_playable': False,
                                       'context_menu': [(
-                                                           'Mark as Watched',
-                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                           'Mark as {0}'.format(watched_state),
+                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_{0}'.format(watched_state.lower()),
                                                                                                  video_type=watch_info['video_type'],
                                                                                                  title=categories['title'].encode('utf-8'),
                                                                                                  imdb_id=mvl_meta['imdb_id'],
@@ -1344,7 +1353,7 @@ def play_video(url, resolved_url, title, video_type):
 
 
             player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
-                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.9,
+                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.01,
                                     watchedCallbackwithParams=WatchedCallbackwithParams)
 
             player.play(playlist)
@@ -1361,6 +1370,7 @@ def play_video(url, resolved_url, title, video_type):
             unplayable = True
     except Exception, e:
         unplayable = True
+        print 'KISU EKTA HOISE'
         print e
 
     if unplayable:
@@ -1679,7 +1689,7 @@ def search(category):
                             mvl_img = thumbnail_url
                             series_name = 'NONE'
 
-                            watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
+                            watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': '0'}
 
                             if categories['top_level_parent'] == '1':
                                 mvl_meta = create_meta('movie', categories['title'], categories['release_date'], mvl_img)
@@ -1693,6 +1703,9 @@ def search(category):
                                 watch_info['season'] = mvl_meta['season']
                                 watch_info['episode'] = mvl_meta['episode']
                                 watch_info['year'] = mvl_meta['premiered'][:4]
+
+                                if watch_info['year'] == '':
+                                    watch_info['year'] = 0
 
                                 if 'series_name' in mvl_meta:
                                     series_name = mvl_meta['series_name'].strip()
@@ -1723,6 +1736,10 @@ def search(category):
                             except:
                                 mvl_plot = categories['synopsis'].encode('utf-8')
 
+                            watched_state = 'Watched'
+                            if mvl_meta['playcount'] > 0:
+                                watched_state = 'Unwatched'
+
                             items += [{
                                           'thumbnail': thumbnail_url,
                                           'properties': {
@@ -1741,15 +1758,16 @@ def search(category):
                                               'cast': categories['actors'].encode('utf-8'),
                                               'year': categories['release_date'],
                                               'premiered': categories['release_date'],
-                                              'duration': mvl_meta['duration']
+                                              'duration': mvl_meta['duration'],
+                                              'playcount': mvl_meta['playcount']
                                           },
                                           'path': plugin.url_for('get_videos', id=categories['video_id'],
                                                                  thumbnail=thumbnail_url, trailer=get_trailer_url(mvl_meta).encode('utf-8'),
                                                                  parent_id=categories['top_level_parent'], series_name=series_name),
                                           'is_playable': False,
                                           'context_menu': [(
-                                                               'Mark as Watched',
-                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                               'Mark as {0}'.format(watched_state),
+                                                               'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_{0}'.format(watched_state.lower()),
                                                                                                  video_type=watch_info['video_type'],
                                                                                                  title=categories['title'].encode('utf-8'),
                                                                                                  imdb_id=mvl_meta['imdb_id'],
@@ -2028,6 +2046,9 @@ def get_azlist(key, page, category):
                             watch_info['episode'] = mvl_meta['episode']
                             watch_info['year'] = mvl_meta['premiered'][:4]
 
+                            if watch_info['year'] == '':
+                                watch_info['year'] = 0
+
                             if 'series_name' in mvl_meta:
                                 series_name = mvl_meta['series_name'].strip()
                             #set layout to Episode
@@ -2055,6 +2076,10 @@ def get_azlist(key, page, category):
                         except:
                             mvl_plot = results['synopsis'].encode('utf-8')
 
+                        watched_state = 'Watched'
+                        if mvl_meta['playcount'] > 0:
+                            watched_state = 'Unwatched'
+
                         items += [{
                                       'thumbnail': thumbnail_url,
                                       'properties': {
@@ -2081,8 +2106,8 @@ def get_azlist(key, page, category):
                                                              parent_id=results['top_level_parent'], series_name=series_name),
                                       'is_playable': False,
                                       'context_menu': [(
-                                                           'Mark as Watched',
-                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_watched',
+                                                           'Mark as {0}'.format(watched_state),
+                                                           'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_{0}'.format(watched_state.lower()),
                                                                                                  video_type=watch_info['video_type'],
                                                                                                  title=categories['title'].encode('utf-8'),
                                                                                                  imdb_id=mvl_meta['imdb_id'],
@@ -2249,6 +2274,7 @@ def init_database():
     db.commit()
     db.close()
 
+
 @plugin.route('/mark_as_watched/<video_type>/<title>/<imdb_id>/<season>/<episode>/<year>')
 def mark_as_watched(video_type, title, imdb_id, season, episode, year):
     if video_type == 'movie':
@@ -2258,36 +2284,15 @@ def mark_as_watched(video_type, title, imdb_id, season, episode, year):
 
     xbmc.executebuiltin("XBMC.Container.Refresh")
 
-    #pass
+@plugin.route('/mark_as_unwatched/<video_type>/<title>/<imdb_id>/<season>/<episode>/<year>')
+def mark_as_unwatched(video_type, title, imdb_id, season, episode, year):
+    if video_type == 'movie':
+        __metaget__.change_watched(video_type, title, imdb_id, season=None, episode=None, year=year, watched=6)
+    elif video_type == 'episode':
+        __metaget__.change_watched(video_type, title, imdb_id, season=season, episode=episode, year=year, watched=6)
 
-    #plugin.log.info(id)
-    #plugin.log.info(title)
-    #plugin.log.info(thumbnail)
-    #plugin.log.info(isplayable)
-    #plugin.log.info(category)
-    #try:
-    #    statement = 'INSERT OR IGNORE INTO favourites (id, title, thumbnail, isplayable, category) VALUES (%s,%s,%s,%s,%s)'
-    #    db = orm.connect(DB_DIR)
-    #    statement = statement.replace("%s", "?")
-    #    cursor = db.cursor()
-    #    cursor.execute(statement, (id, title, thumbnail, isplayable, category))
-    #    db.commit()
-    #    db.close()
-    #except:
-    #    # xbmc.executebuiltin('Notification(Database Error, Please contact software provider,5000,/script.hellow.world.png)')
-    #    showMessage('Database Error', 'Please contact software provider')
+    xbmc.executebuiltin("XBMC.Container.Refresh")
 
-# @plugin.route('/remove_favourite/<id>/<title>/<category>')
-# def remove_favourite(id, title, category):
-#     statement = 'DELETE FROM favourites WHERE id=%s AND title=%s AND category=%s'
-#     db = orm.connect(DB_DIR)
-#     statement = statement.replace("%s", "?")
-#     cursor = db.cursor()
-#     cursor.execute(statement, (id, title, category))
-#     db.commit()
-#     db.close()
-#     return xbmc.executebuiltin("XBMC.Container.Refresh()")
-#
 
 def sys_exit():
     hide_busy_dialog()
