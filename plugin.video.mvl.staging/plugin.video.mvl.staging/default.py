@@ -1061,8 +1061,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             sd_count = 0
             for urls in jsonObj:
                 # if parent_id == '1' and urls['resolved_URL'] == 'NONE':
-                # if urls['resolved_URL'] == 'NONE':
-                #    continue
+                if urls['resolved_URL'] == 'NONE':
+                    continue
 
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
@@ -1264,11 +1264,11 @@ def play_video(url, resolved_url, title, video_type):
     # if login_check():
     unplayable = False
     try:
-        if resolved_url != 'NONE':
-            #no need to resolve the url on client side
-            #use the pre-resolved url
-            hostedurl = resolved_url
-        elif url.find('youtube.com') != -1:
+        # if resolved_url != 'NONE':
+        #     #no need to resolve the url on client side
+        #     #use the pre-resolved url
+        #     hostedurl = resolved_url
+        if url.find('youtube.com') != -1:
             #this is youtube video
             #resolve ourselves
             from resources.youtube import YouTubeResolver
