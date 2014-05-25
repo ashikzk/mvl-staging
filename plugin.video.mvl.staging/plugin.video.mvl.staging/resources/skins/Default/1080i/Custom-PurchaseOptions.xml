@@ -36,7 +36,7 @@
         <width>960</width>
         <label>-</label>
         <font>SetContent</font>
-        <align>center</align>
+        <align>left</align>
       </control>
       <control type="label" id="23" description="Line 2">
         <posx>51</posx>
@@ -45,7 +45,7 @@
         <width>960</width>
         <label>-</label>
         <font>SetContent</font>
-        <align>center</align>
+        <align>left</align>
       </control>
       <control type="label" id="24" description="Line 3">
         <posx>51</posx>
@@ -54,7 +54,7 @@
         <width>960</width>
         <label>-</label>
         <font>SetContent</font>
-        <align>center</align>
+        <align>left</align>
       </control>
       <control type="label" id="25" description="Line 4">
         <posx>51</posx>
@@ -63,7 +63,7 @@
         <width>960</width>
         <label>-</label>
         <font>SetContent</font>
-        <align>center</align>
+        <align>left</align>
       </control>
       <control type="button" id="10" description="OK">
         <posx>381</posx>
