@@ -1041,7 +1041,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                       }]
 
 
-            src_list = ['firedrive', 'putlocker', 'movreel', 'promptfile', 'mightyupload', 'novamov', 'nowvideo', 'hugefile', 'billionupload', '180upload', 'lemupload', 'gorillavid']
+            src_list = ['firedrive', 'putlocker', 'movreel', 'promptfile', 'mightyupload', 'novamov', 'nowvideo', 'lemupload', 'gorillavid']
+            #'hugefile', 'billionupload', '180upload',
 
             for urls in jsonObj:
                 src_order = 0
@@ -1088,6 +1089,9 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             for urls in jsonObj:
                 # if urls['resolved_URL'] == 'NONE':
                 #     continue
+                if urls['URL'].find('billionupload') >= 0 or urls['URL'].find('180upload') >= 0 or urls['URL'].find('hugefile') >= 0:
+                    #discard these 3 source for hd
+                    continue
 
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
