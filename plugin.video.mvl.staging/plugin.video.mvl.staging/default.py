@@ -237,6 +237,8 @@ def index():
                                   'path': plugin.url_for('get_categories', id=categories['id'], page=0),
                                   'is_playable': False,
                                   'thumbnail': art('{0}.png'.format(categories['title'].lower())),
+                                  'context_menu': [('','',)],
+                                  'replace_context_menu': True
                               }]
 
                 # hide_busy_dialog()
@@ -645,6 +647,8 @@ def get_categories(id, page):
                                               'label': '[COLOR FFC41D67]Estimated Release Date[/COLOR]',
                                               'path': plugin.url_for('do_nothing', view_mode=0),
                                               'is_playable': False,
+                                              'context_menu': [('','',)],
+                                              'replace_context_menu': True
                                           }]
 
 
@@ -653,7 +657,9 @@ def get_categories(id, page):
                             items += [{
                                           'label': categories['release_group'],
                                           'path': plugin.url_for('do_nothing', view_mode=0),
-                                          'is_playable': False
+                                          'is_playable': False,
+                                          'context_menu': [('','',)],
+                                          'replace_context_menu': True
                                       }]
 
                     ####
@@ -664,7 +670,9 @@ def get_categories(id, page):
                                       'label': 'Next >>',
                                       'path': plugin.url_for('get_categories', id=parent_id, page=(int(page) + 1)),
                                       'is_playable': False,
-                                      'thumbnail': art('next.png')
+                                      'thumbnail': art('next.png'),
+                                      'context_menu': [('','',)],
+                                      'replace_context_menu': True
                                   }]
                     #categories['is_playable'] is False for all categories and True for all video Items
                     elif categories['is_playable'] == 'False':
@@ -1308,7 +1316,7 @@ def play_video(url, resolved_url, title, video_type):
 
 
             player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
-                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.01,
+                                    season='', episode='', year=mvl_meta['year'], watch_percent=0.9,
                                     watchedCallbackwithParams=WatchedCallbackwithParams)
 
             #try:
