@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.mvl.staging" name="My Video library - Staging" version="1.0.46" provider-name="Mukto Software Ltd.">
+<addon id="plugin.video.mvl.staging" name="My Video library - Staging" version="1.0.47" provider-name="Mukto Software Ltd.">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.xbmcswift2" version="2.4.0"/>

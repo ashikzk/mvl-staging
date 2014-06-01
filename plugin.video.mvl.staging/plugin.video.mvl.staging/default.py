@@ -1042,8 +1042,9 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                       }]
 
 
-            src_list = ['firedrive', 'putlocker', 'movreel', 'promptfile', 'mightyupload', 'novamov', 'nowvideo', 'lemupload', 'gorillavid']
+            src_list = ['movreel', 'promptfile', 'mightyupload', 'novamov', 'nowvideo', 'lemupload', 'gorillavid']
             #'hugefile', 'billionupload', '180upload',
+            # 'firedrive', 'putlocker',
 
             for urls in jsonObj:
                 src_order = 0
