@@ -14,10 +14,17 @@ try:
         # print "PATH (OLD)  = " + path
 
         xbmc.executebuiltin( "Action(back)" )
-        # time.sleep(0.02)
+        time.sleep(0.05)
 
         path_new = xbmc.getInfoLabel('Container.FolderPath')
         # print "PATH (NEW) = " + path_new
+
+        #save new path and set it as current location path
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'screen_path.dat')
+        f = open(file_path, 'w')
+        f.write(path_new)
+        f.close()
+
 
         if len(path.split('/')) >= 6 and path_new != path:
             #make sure path has changed cause in case of context menu, path doesn't change and view shouldn't change then
