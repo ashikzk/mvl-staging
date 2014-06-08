@@ -126,6 +126,7 @@ isAgree = False
 @plugin.route('/')
 def index():
     global Main_cat
+    global last_path
 
     file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'quit_log.dat')
     f = open(file_path, 'w')
@@ -419,10 +420,14 @@ def check_condition():
         terms_popup.updateTermText(heading, text)
         terms_popup.doModal()
 
-        #if agree_ret:
-        #    onClick_agree()
-        #else:
-        #    onClick_disAgree()
+        #make sure either Agree or disagree was clicked
+        #if none was clicked, then go back to home
+        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'term_agree.dat')
+        f = open(file_path, 'r')
+        content = f.read()
+        f.close()
+        if content == 'false':
+            onClick_disAgree()
 
     elif content == 'true':
         global isAgree
