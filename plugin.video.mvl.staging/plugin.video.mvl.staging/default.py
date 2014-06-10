@@ -1564,7 +1564,7 @@ def search(category):
         if not show_notification():
         
             try:
-                search_string = plugin.keyboard(heading=('search'))
+                search_string = plugin.keyboard(heading=('Search Media Engine'))
                 
                 #if nothing was typed, return without doing anything
                 if search_string is None or search_string == '' :
