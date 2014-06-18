@@ -1,6 +1,7 @@
 
 
-def crawl_categories(id, page):
+
+def crawl_categories(id, page, az_key):
 
     try:
 
@@ -9,10 +10,13 @@ def crawl_categories(id, page):
         is_search_category = False
         top_level_parent = 0
         page_limit_cat = 30
+        page_limit_az = 200
 
-        url = server_url + "/api/index.php/api/categories_api/getCategories?parent_id={0}&page={1}&limit={2}".format(id,
-                                                                                                                     page,
-                                                                                                                     page_limit_cat)
+        if az_key is None:
+            url = server_url + "/api/index.php/api/categories_api/getCategories?parent_id={0}&page={1}&limit={2}".format(id, page, page_limit_cat)
+        else:
+            url = server_url + "/api/index.php/api/categories_api/getAZList?key={0}&page={1}&category={2}&limit={3}".format(az_key, page, id, page_limit_az)
+
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
         f = opener.open(req)
@@ -58,12 +62,14 @@ def crawl_categories(id, page):
                         #there is something wrong with this playable item. just ignore
                         continue
 
-                    if categories['source'] == '1':
-                        thumbnail_url = categories['image_name']
-                    else:
-                        thumbnail_url = server_url + '/wp-content/themes/twentytwelve/images/{0}'.format(categories['video_id'] + categories['image_name'])
+                    #if 'source' in categories and categories['source'] == '1':
+                    #    thumbnail_url = categories['image_name']
+                    #else:
+                    #    thumbnail_url = server_url + '/wp-content/themes/twentytwelve/images/{0}'.format(categories['video_id'] + categories['image_name'])
 
-                    mvl_img = thumbnail_url
+
+                    #mvl_img = thumbnail_url
+                    mvl_img = ''
                     series_name = 'NONE'
 
                     if categories['top_level_parent'] == '1':
@@ -87,8 +93,15 @@ def crawl_categories(id, page):
 
 
 
+section_id = 1
+page_no = 0
 
-ret = crawl_categories(1, 0)
-#ret = crawl_categories(3, 0)
+#ret = crawl_categories(section_id, page_no)
+
+az_keys = ['%23', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+           'V', 'W', 'X', 'Y', 'Z']
+for az_key in az_keys:
+    ret = crawl_categories(section_id, page_no, az_key)
 
 sys_exit()
+
