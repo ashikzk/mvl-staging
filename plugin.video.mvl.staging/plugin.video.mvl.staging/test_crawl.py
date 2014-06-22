@@ -1,6 +1,5 @@
 
 
-
 def crawl_categories(id, page, az_key):
 
     try:
@@ -53,7 +52,7 @@ def crawl_categories(id, page, az_key):
                             mvl_meta = create_meta('tvshow', categories['title'].encode('utf-8'), '', '')
 
                     else:
-                        crawl_categories(categories['id'], 0)
+                        crawl_categories(categories['id'], 0, None)
 
                 #inorder for the information to be displayed properly, corresponding labels should be added in skin
                 elif categories['is_playable'] == 'True':
@@ -88,6 +87,7 @@ def crawl_categories(id, page, az_key):
     except Exception, e:
         print 'Exception...'
         print e
+
 
 
 
