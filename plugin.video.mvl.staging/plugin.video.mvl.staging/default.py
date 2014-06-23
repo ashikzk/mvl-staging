@@ -1572,7 +1572,22 @@ def search(category):
             try:
                 #search_string = plugin.keyboard(heading=('Search Media Engine'))
 
-                kb = CustomKeyboard('Custom-DialogKeyboard.xml', os.path.dirname(os.path.realpath(__file__)), category = category)
+                #load word list
+                if category == '1':
+                    file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/movie_names.dat')
+                else:
+                    file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/tv_names.dat')
+
+                words = Trie()
+                f = open(file_path,'r')
+                cnt = 0
+                for line in f.readlines():
+                    words.insert(line.strip().lower(), 1)
+                    cnt += 1
+                f.close()
+                #
+
+                kb = CustomKeyboard('Custom-DialogKeyboard.xml', os.path.dirname(os.path.realpath(__file__)), category = category, words=words)
                 kb.doModal()
                 search_string = kb.labelString
 
@@ -2109,7 +2124,7 @@ def get_azlist(key, page, category):
                                                            'Mark as {0}'.format(watched_state),
                                                            'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_{0}'.format(watched_state.lower()),
                                                                                                  video_type=watch_info['video_type'],
-                                                                                                 title=results['title'].encode('utf-8'),
+                                                                                                 title=results['title'],
                                                                                                  imdb_id=mvl_meta['imdb_id'],
                                                                                                  year=watch_info['year'],
                                                                                                  season=watch_info['season'],
@@ -2519,8 +2534,9 @@ class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
         if control == 10:
             self.close()
 
+
 class CustomKeyboard(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, category, defaultSkin = "Default", defaultRes = "1080i"):
+    def __init__(self, xmlFilename, scriptPath, category, words, defaultSkin = "Default", defaultRes = "1080i"):
         self.isUpper  = 0
         self.isSymbol = 0
         self.isLock   = 0
@@ -2530,37 +2546,36 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.cursorState = 1
         self.cursorPos   = 0
         self.labelString = None
-        # self.close()
-        self.createTrie()
         self.updateKeyboardLabel()
-        # pass
+        self.words = words
 
-    def createTrie(self):
-        self.words = Trie()
-        print self.category
-        file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/movie_names.dat')
-        if self.category == '3':
-            file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/tv_names.dat')
+    # def createTrie(self):
+        #self.words = Trie()
+        #file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/movie_names.dat')
+        #if self.category == '3':
+        #    file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/tv_names.dat')
+        #
+        #f = open(file_path,'r')
+        #cnt = 0
+        #for line in f.readlines():
+        #    self.words.insert(line.strip().lower(), 1)
+        #    cnt += 1
+        #f.close()
 
-        f = open(file_path,'r')
-        cnt = 0
-        for line in f.readlines():
-            self.words.insert(line.strip().lower(), 1)
-            cnt += 1
-        f.close()
-        #print cnt
-
-        '''while line = fo.readline():
-            words.'''
-
-        return
+        # if self.category == '1':
+        #     self.words = words_movie
+        # elif self.category == '3':
+        #     self.words = words_tv
+        #
+        # #print len(self.words)
+        #
+        # return
 
 
     def showCursor(self):
         if self.isLock == 1:
             time.sleep(.1)
-            #return
-        #print "testing"
+
         label = self.getControl(310).getLabel()
         labelList = list(label)
         if self.cursorState == 0:
