@@ -63,7 +63,7 @@ from threading import Thread
 
 import resources._common as common
 from resources import playbackengine
-from resources.trie import Trie
+from resources.trie import trie
 
 
 #Patch Locale for android devices
@@ -1578,11 +1578,11 @@ def search(category):
                 else:
                     file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/tv_names.dat')
 
-                words = Trie()
+                words = trie()
                 f = open(file_path,'r')
                 cnt = 0
                 for line in f.readlines():
-                    words.insert(line.strip().lower(), 1)
+                    words[line.strip().lower()] = None
                     cnt += 1
                 f.close()
                 #
@@ -2669,6 +2669,10 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
     #         self.getControl(310).setLabel(str(action.getId()))
 
     def updateSuggestion(self):
+        #return
+        for i in range(434, 439):
+            self.getControl(i).setVisible(False)
+            self.getControl(i).setLabel('')
         label = self.getControl(310).getLabel()
         labelList = list(label)
         del labelList[self.cursorPos]
@@ -2677,17 +2681,15 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         label = ''.join(labelList)
         label = label.lower()
         control = 434
-        for i in range(434, 439):
-            self.getControl(i).setVisible(False)
-            self.getControl(i).setLabel('')
+
         #r = requests.get('http://config.myvideolibrary.com/api/index.php/api/categories_api/getAZList?key=A&page=0&category=3&limit=5')
         #print r.text
-        sugg = self.words.startwith(label)
+        sugg = self.words.iter(label)
         cnt = 0
         for word in sugg:
             if control > 438:
                 break
-            self.getControl(control).setLabel(word[0])
+            self.getControl(control).setLabel(word)
             self.getControl(control).setVisible(True)
             control += 1
         return
