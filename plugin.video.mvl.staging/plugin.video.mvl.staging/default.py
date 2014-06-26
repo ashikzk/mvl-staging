@@ -1010,6 +1010,11 @@ def get_categories(id, page):
 
                 dp.close()
 
+            else:
+               showMessage('No result found', 'Sorry, No information Found Matching Your Query')
+               hide_busy_dialog()
+               exit()                
+               
 
             #we should set the view_mode as last thing in this method
             #because if user cancels his action and goes back before the api response
@@ -2515,26 +2520,6 @@ class CustomReviewPopup(xbmcgui.WindowXMLDialog):
             self.close()
             resume_popup_window()
 
-class CustomPurchaseOptions(xbmcgui.WindowXMLDialog):
-    def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
-        pass
-
-    def showDialog(self):
-        self.show()
-        self.getControl(21).setLabel("Purchase & Viewing")
-        self.getControl(22).setLabel("Amazon.com .................. [COLOR FF1F6C15]www.amazon.com/dvd[/COLOR]")
-        self.getControl(23).setLabel("Google Play ................... [COLOR FF1F6C15]www.play.google.com/store/movies[/COLOR]")
-        self.getControl(24).setLabel("iTunes.com ..................... [COLOR FF1F6C15]www.apple.com/itunes/charts/movies[/COLOR]")
-        self.getControl(25).setLabel("Fandango ....................... [COLOR FF1F6C15]www.fandango.com[/COLOR]")
-        self.close()
-
-        self.doModal()
-
-    def onClick	(self, control):
-        if control == 10:
-            self.close()
-
-
 class CustomKeyboard(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, category, words, defaultSkin = "Default", defaultRes = "1080i"):
         self.isUpper  = 0
@@ -2549,35 +2534,13 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.updateKeyboardLabel()
         self.words = words
 
-    # def createTrie(self):
-        #self.words = Trie()
-        #file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/movie_names.dat')
-        #if self.category == '3':
-        #    file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/data/tv_names.dat')
-        #
-        #f = open(file_path,'r')
-        #cnt = 0
-        #for line in f.readlines():
-        #    self.words.insert(line.strip().lower(), 1)
-        #    cnt += 1
-        #f.close()
-
-        # if self.category == '1':
-        #     self.words = words_movie
-        # elif self.category == '3':
-        #     self.words = words_tv
-        #
-        # #print len(self.words)
-        #
-        # return
-
 
     def showCursor(self):
         if self.isLock == 1:
             time.sleep(.1)
 
         label = self.getControl(310).getLabel()
-        labelList = list(label)
+        labelList = list(str(label))
         if self.cursorState == 0:
             labelList[self.cursorPos] = '|'
             self.cursorState = 1
@@ -2588,15 +2551,11 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.getControl(310).setLabel(label)
         time.sleep(.4)
         self.showCursor()
-        '''
-        for i in range(1,5):
-            time.sleep(3)
-            self.getControl(310).setLabel('Thread' + str(i))'''
 
 
     def updateKeyboardLabel(self):
 
-        self.getControl(311).setLabel("Search")
+        self.getControl(311).setLabel("Search Media Engine")
         self.getControl(310).setLabel("|")
         for i in range(434, 439):
             self.getControl(i).setVisible(False)
@@ -2694,7 +2653,128 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
             control += 1
         return
 
-        
+    def moveLeft(self):
+        self.isLock = 1
+        label = self.getControl(310).getLabel()
+        if(self.cursorPos == 0):
+            self.isLock = 0
+            return
+        labelList = list(label)
+        #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
+        del labelList[self.cursorPos]
+        self.cursorPos -= 1
+        if(self.cursorPos < 0):
+            self.cursorPos = 0
+        newLabelList = []
+        for i in range(0, self.cursorPos):
+            newLabelList.append(labelList[i])
+        newLabelList.append(' ')
+        for i in range(self.cursorPos, len(labelList)):
+            newLabelList.append(labelList[i])
+        if self.cursorState == 1:
+            newLabelList[self.cursorPos] = '|'
+            self.cursorState = 1
+        else:
+            newLabelList[self.cursorPos] = ' '
+            self.cursorState = 0
+        label = ''.join(newLabelList)
+        self.getControl(310).setLabel(label)
+        self.updateSuggestion()
+        self.isLock = 0
+        return
+
+
+    def moveRight(self):
+        self.isLock = 1
+        label = self.getControl(310).getLabel()
+        if(self.cursorPos == len(label)-1):
+            self.isLock = 0
+            return
+        labelList = list(label)
+        #self.cursorPos += 1
+        #if(self.cursorPos >= len(label)):
+        #    self.cursorPos = len(label)-1
+
+
+        #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
+        del labelList[self.cursorPos]
+        newLabelList = []
+        for i in range(0, self.cursorPos+1):
+            newLabelList.append(labelList[i])
+        newLabelList.append(' ')
+        for i in range(self.cursorPos+1, len(labelList)):
+            newLabelList.append(labelList[i])
+        self.cursorPos += 1
+        if(self.cursorPos >= len(label)-1):
+            self.cursorPos = len(label)-1
+        if self.cursorState == 1:
+            newLabelList[self.cursorPos] = '|'
+            self.cursorState = 1
+        else:
+            newLabelList[self.cursorPos] = ' '
+            self.cursorState = 0
+        label = ''.join(newLabelList)
+        self.getControl(310).setLabel(label)
+        self.isLock = 0
+        return
+
+
+    def deleteChar(self):
+        self.isLock = 1
+        if self.cursorPos == 0:
+            self.isLock = 0
+            return
+        label = self.getControl(310).getLabel()
+        labelList = list(label)
+        #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
+        del labelList[self.cursorPos-1]
+        #sym = self.findSymbol(control)
+        #labelList += list(sym)
+        self.cursorPos -= 1
+        if(self.cursorPos < 0):
+            self.cursorPos = 0
+        #print self.cursorPos
+        if self.cursorState == 1:
+            labelList[self.cursorPos] = '|'
+            self.cursorState = 1
+        else:
+            labelList[self.cursorPos] = ' '
+            self.cursorState = 0
+        label = ''.join(labelList)
+        self.getControl(310).setLabel(label)
+        self.updateSuggestion()
+        self.isLock = 0
+        return
+
+    def insertChar(self, sym):
+        self.isLock = 1
+        #print self.words.__len__()
+        label = self.getControl(310).getLabel()
+        labelList = list(label)
+        #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
+        #del labelList[self.cursorPos]
+        newLabelList = []
+        for i in range(0, self.cursorPos):
+            newLabelList.append(labelList[i])
+        newLabelList += list(sym)
+        for i in range(self.cursorPos, len(labelList)):
+            newLabelList.append(labelList[i])
+        #labelList.append('')
+        self.cursorPos += len(sym)
+        #print self.cursorPos
+        if self.cursorState == 1:
+            newLabelList[self.cursorPos] = '|'
+            self.cursorState = 1
+        else:
+            newLabelList[self.cursorPos] = ' '
+            self.cursorState = 0
+        label = ''.join(newLabelList)
+        self.getControl(310).setLabel(label)
+        self.updateSuggestion()
+        self.isLock = 0
+        return
+
+
     #def onAction(self, action):
     #    if action.getId() != 100 and action.getId() != 107:
     #        v = action.getButtonCode() & 255
@@ -2731,7 +2811,6 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
     #        ''''''
     #    pass
 
-        
     def onClick (self, control):
         #print "control test"
         if control == 300:
@@ -2750,95 +2829,16 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
 
         ''' This Thing is needed to be done '''
         if control == 305:
-            self.isLock = 1
-            label = self.getControl(310).getLabel()
-            if(self.cursorPos == 0):
-                self.isLock = 0
-                return
-            labelList = list(label)
-            #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
-            del labelList[self.cursorPos]
-            self.cursorPos -= 1
-            if(self.cursorPos < 0):
-                self.cursorPos = 0
-            newLabelList = []
-            for i in range(0, self.cursorPos):
-                newLabelList.append(labelList[i])
-            newLabelList.append(' ')
-            for i in range(self.cursorPos, len(labelList)):
-                newLabelList.append(labelList[i])
-            if self.cursorState == 1:
-                newLabelList[self.cursorPos] = '|'
-                self.cursorState = 1
-            else:
-                newLabelList[self.cursorPos] = ' '
-                self.cursorState = 0
-            label = ''.join(newLabelList)
-            self.getControl(310).setLabel(label)
-            self.updateSuggestion()
-            self.isLock = 0
+            self.moveLeft()
             return
 
 
         if control == 306:
-            self.isLock = 1
-            label = self.getControl(310).getLabel()
-            if(self.cursorPos == len(label)-1):
-                self.isLock = 0
-                return
-            labelList = list(label)
-            #self.cursorPos += 1
-            #if(self.cursorPos >= len(label)):
-            #    self.cursorPos = len(label)-1
-
-
-            #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
-            del labelList[self.cursorPos]
-            newLabelList = []
-            for i in range(0, self.cursorPos+1):
-                newLabelList.append(labelList[i])
-            newLabelList.append(' ')
-            for i in range(self.cursorPos+1, len(labelList)):
-                newLabelList.append(labelList[i])
-            self.cursorPos += 1
-            if(self.cursorPos >= len(label)-1):
-                self.cursorPos = len(label)-1
-            if self.cursorState == 1:
-                newLabelList[self.cursorPos] = '|'
-                self.cursorState = 1
-            else:
-                newLabelList[self.cursorPos] = ' '
-                self.cursorState = 0
-            label = ''.join(newLabelList)
-            self.getControl(310).setLabel(label)
-            self.isLock = 0
+            self.moveRight()
             return
 
         if control == 8: #Del/ Backspace
-            self.isLock = 1
-            label = self.getControl(310).getLabel()
-            labelList = list(label)
-            #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
-            del labelList[self.cursorPos]
-            #sym = self.findSymbol(control)
-            #labelList += list(sym)
-            if(len(labelList) > 0):
-                labelList = labelList[:(len(labelList)-1)]
-            labelList.append('')
-            self.cursorPos -= 1
-            if(self.cursorPos < 0):
-                self.cursorPos = 0
-            #print self.cursorPos
-            if self.cursorState == 1:
-                labelList[self.cursorPos] = '|'
-                self.cursorState = 1
-            else:
-                labelList[self.cursorPos] = ' '
-                self.cursorState = 0
-            label = ''.join(labelList)
-            self.getControl(310).setLabel(label)
-            self.updateSuggestion()
-            self.isLock = 0
+            self.deleteChar()
             return
 
         if control == 303 or control == 302:
@@ -2883,38 +2883,8 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
 
             self.isLock = 0
             return
-        self.isLock = 1
-        #print self.words.__len__()
-        label = self.getControl(310).getLabel()
-        labelList = list(label)
-        #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
-        #del labelList[self.cursorPos]
-        sym = self.findSymbol(control)
-        newLabelList = []
-        for i in range(0, self.cursorPos):
-            newLabelList.append(labelList[i])
-        newLabelList += list(sym)
-        for i in range(self.cursorPos, len(labelList)):
-            newLabelList.append(labelList[i])
-        #labelList.append('')
-        self.cursorPos += len(sym)
-        #print self.cursorPos
-        if self.cursorState == 1:
-            newLabelList[self.cursorPos] = '|'
-            self.cursorState = 1
-        else:
-            newLabelList[self.cursorPos] = ' '
-            self.cursorState = 0
-        label = ''.join(newLabelList)
-        self.getControl(310).setLabel(label)
-        self.updateSuggestion()
-        self.isLock = 0
-        # if control == 11:
-        #     self.close()
-        #     onClick_agree()
-        # elif control == 10:
-        #     self.close()
-        #     onClick_disAgree()
+
+        self.insertChar(self.findSymbol(control))
 
 
 
