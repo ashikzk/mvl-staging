@@ -15,6 +15,7 @@
         <height>60</height>
         <visible>true</visible>
         <align>center</align>
+        <textcolor>FFC41D67</textcolor>
         <aligny>center</aligny>
         <scroll>false</scroll>
     </include>
