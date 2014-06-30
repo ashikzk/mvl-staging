@@ -2596,7 +2596,6 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
             except:
                 pass
 
-
     def updateKeyboardLabelSymbols(self):
         keys = "QWERTYUIOPASDFGHJKLZXCVBNM"
         symbols = "!@#$%^&*()_-+[]|\\:;'<>?/.,"
@@ -2606,6 +2605,7 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
                 self.getControl(ord(keys[i])).setLabel(symbols[i])
             except:
                 pass
+
     def findSymbol(self, control):
         ret = ''
         if self.isSymbol != 1:
@@ -2619,13 +2619,6 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
             pos = keys.find(ret)
             ret = symbols[pos]
         return ret
-    # def onAction(self, action):
-    #     print action
-    #     self.getControl(310).setLabel(str(action.getId()))
-    #     if action.getId() == 100:
-    #         self.close()
-    #     elif action.getId() == 65:
-    #         self.getControl(310).setLabel(str(action.getId()))
 
     def updateSuggestion(self):
         #return
@@ -2683,7 +2676,6 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.isLock = 0
         return
 
-
     def moveRight(self):
         self.isLock = 1
         label = self.getControl(310).getLabel()
@@ -2717,7 +2709,6 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.getControl(310).setLabel(label)
         self.isLock = 0
         return
-
 
     def deleteChar(self):
         self.isLock = 1
@@ -2774,42 +2765,41 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         self.isLock = 0
         return
 
+    def onAction(self, action):
+        if action.getId() != 100 and action.getId() != 107:
+            v = action.getButtonCode() & 255
+            if v >= 33 and v <= 126: #ascii
+                v = chr(v)
+                if self.isUpper == 0:
+                    v = v.lower()
+                self.insertChar(v)
+            elif v == 8: #backspace
+                self.deleteChar()
+            elif v == 130: #left
+                self.moveLeft()
+            elif v == 131: #right
+                self.moveRight()
+            elif v == 13: #enter
+                label = self.getControl(310).getLabel()
+                labelList = list(label)
+                #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
+                del labelList[self.cursorPos]
+                self.labelString = ''.join(labelList)
+                self.close()
+                pass
+            elif v == 27:
+                self.labelString = ''
+                self.close()
+                pass
+            elif v == 32:
+                self.insertChar(' ')
+            else:
+                pass
 
-    #def onAction(self, action):
-    #    if action.getId() != 100 and action.getId() != 107:
-    #        v = action.getButtonCode() & 255
-    #        if v >= 33 and v <= 126: #ascii
-    #            v = chr(v)
-    #            if self.isUpper == 0:
-    #                v = v.lower()
-    #            self.insertChar(v)
-    #        elif v == 8: #backspace
-    #            self.deleteChar()
-    #        elif v == 130: #left
-    #            self.moveLeft()
-    #        elif v == 131: #right
-    #            self.moveRight()
-    #        elif v == 13: #enter
-    #            label = self.getControl(310).getLabel()
-    #            labelList = list(label)
-    #            #print "{0}, {1}, {2}".format(self.cursorPos, label, len(label))
-    #            del labelList[self.cursorPos]
-    #            self.labelString = ''.join(labelList)
-    #            self.close()
-    #            pass
-    #        elif v == 27:
-    #            self.labelString = ''
-    #            self.close()
-    #            pass
-    #        elif v == 32:
-    #            self.insertChar(' ')
-    #        else:
-    #            pass
-    #
-    #        #print "muri "+ str(v)
-    #        # 8 back, 9 tab, 13 enter, esc 27, left 130, right 131
-    #        ''''''
-    #    pass
+            #print "muri "+ str(v)
+            # 8 back, 9 tab, 13 enter, esc 27, left 130, right 131
+            ''''''
+        pass
 
     def onClick (self, control):
         #print "control test"
