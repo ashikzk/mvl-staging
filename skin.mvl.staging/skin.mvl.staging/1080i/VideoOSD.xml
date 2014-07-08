@@ -42,6 +42,7 @@
         <onup>noop</onup>
         <ondown>702</ondown>
         <defaultcontrol always="true">602</defaultcontrol>
+        
         <control type="button" id="600">
           <posx>-60</posx>
           <posy>-40</posy>
@@ -138,7 +139,33 @@
           <ondown>702</ondown>
           <onclick>PlayerControl(Next)</onclick>
         </control>
+        
+        <control type="togglebutton" id="250">
+            <posx>200r</posx>
+            <posy>-40</posy>
+            <width>185</width>
+            <height>185</height>
+            <label>31356</label>
+            <font>-</font>
+            <texturefocus>VideoOSD/OSDSubtitlesFO.png</texturefocus>
+            <texturenofocus>VideoOSD/OSDSubtitlesNF.png</texturenofocus>
+            <alttexturefocus>VideoOSD/OSDSubtitlesFO.png</alttexturefocus>
+            <alttexturenofocus>VideoOSD/OSDSubtitlesNF.png</alttexturenofocus>
+            <onleft>205</onleft>
+            <onright>251</onright>
+            <onup>1000</onup>
+            <ondown>1000</ondown>
+            <onclick>Close</onclick>
+            <onclick>XBMC.RunScript($INFO[Skin.String(SubtitleScript_Path)])</onclick>
+            <altclick>Skin.SetAddon(SubtitleScript_Path,xbmc.python.subtitles)</altclick>
+            <altclick condition="Window.IsVisible(VideoOSD)">Dialog.Close(VideoOSD)</altclick>
+            <altclick condition="!IsEmpty(Skin.String(SubtitleScript_Path))">XBMC.RunScript($INFO[Skin.String(SubtitleScript_Path)])</altclick>
+            <usealttexture>IsEmpty(Skin.String(SubtitleScript_Path))</usealttexture>
+        </control>
+        
       </control>
+      
+      
       <control type="group" id="100">
         <visible>VideoPlayer.Content(LiveTV)</visible>
         <posx>723</posx>
@@ -244,6 +271,7 @@
           <onclick>ActivateWindow(PVROSDGuide)</onclick>
           <onclick>Dialog.Close(VideoOSD)</onclick>
         </control>
+        
       </control>
       <control type="group" id="101">
         <visible>!VideoPlayer.Content(LiveTV)</visible>

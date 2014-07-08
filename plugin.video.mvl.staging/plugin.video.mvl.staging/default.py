@@ -1392,7 +1392,7 @@ def play_video(url, resolved_url, title, video_type):
 
 
             while player._playbackLock.isSet():
-                print('- - -' +'Playback lock set. Sleeping for 250.')
+                #print('- - -' +'Playback lock set. Sleeping for 250.')
                 xbmc.sleep(250)
 
             #if we are here, it means playback has either stopped or finished
@@ -2389,7 +2389,6 @@ class CustomTermsPopup(xbmcgui.WindowXMLDialog):
         elif control == 10:
             self.close()
             onClick_disAgree()
-
 
 
 class CustomPopup(xbmcgui.WindowXMLDialog):
