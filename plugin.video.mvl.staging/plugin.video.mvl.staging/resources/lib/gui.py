@@ -199,6 +199,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
     msg = ""
     socket.setdefaulttimeout(float(__addon__.getSetting( "timeout" )))
     try:
+      print 'Searching subtitles'
       self.subtitles_list, self.session_id, msg = self.Service.search_subtitles(
                                                        self.file_original_path,
                                                        self.title,
