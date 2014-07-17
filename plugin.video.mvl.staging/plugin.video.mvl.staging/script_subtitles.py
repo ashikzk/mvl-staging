@@ -11,10 +11,10 @@ class DummyAddon:
 
   def getSetting(self, string):
       if string == 'lang':
-        if len(xbmcaddon.Addon(id='plugin.video.mvl').getSetting(string)) == 0:
+        if len(xbmcaddon.Addon(id='plugin.video.mvl.staging').getSetting(string)) == 0:
           return 'English'
         else:
-          return xbmcaddon.Addon(id='plugin.video.mvl').getSetting(string)
+          return xbmcaddon.Addon(id='plugin.video.mvl.staging').getSetting(string)
       elif string == 'OpenSubtitles':
           return "true"
       elif string == 'timeout':
@@ -23,7 +23,7 @@ class DummyAddon:
           return "false"
 
   def setSetting(self, id, value):
-      xbmcaddon.Addon(id='plugin.video.mvl').setSetting(id, value)
+      xbmcaddon.Addon(id='plugin.video.mvl.staging').setSetting(id, value)
       pass
 
 
@@ -36,7 +36,7 @@ __author__     = 'Mukto Software Ltd.'
 __scriptid__   = 'script_subtitles'#script.xbmc.subtitles
 __scriptname__ = 'XBMC Subtitles'
 __version__    = '3.9.18'
-__language__   = xbmcaddon.Addon(id='plugin.video.mvl').getLocalizedString
+__language__   = xbmcaddon.Addon(id='plugin.video.mvl.staging').getLocalizedString
 
 
 
