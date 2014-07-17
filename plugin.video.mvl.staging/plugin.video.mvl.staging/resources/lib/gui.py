@@ -59,10 +59,13 @@ class GUI( xbmcgui.WindowXMLDialog ):
     self.language_2      = languageTranslate(__addon__.getSetting("lang"),0,0) 
     self.language_3      = languageTranslate(__addon__.getSetting("lang"),0,0) 
     self.lang_1          = languageTranslate(30202, 5, 0)
-    self.lang_2      = languageTranslate(30211, 5, 0)     # Full language 2
-    self.lang_3      = languageTranslate(30212, 5, 0)     # Full language 3
-    self.lang_4      = languageTranslate(30215, 5, 0)
+    self.lang_2      = languageTranslate(30212, 5, 0)     # Full language 2
+    self.lang_3      = languageTranslate(30215, 5, 0)     # Full language 3
+    self.lang_4      = languageTranslate(30234, 5, 0)
     self.lang_5      = languageTranslate(30240, 5, 0)
+
+    print "LANGUAGE = "
+    print languageTranslate(__addon__.getSetting("lang"),0,0)
     
     self.tmp_sub_dir     = os.path.join( __profile__ ,"sub_tmp" )                        # Temporary subtitle extraction directory
     self.stream_sub_dir  = os.path.join( __profile__ ,"sub_stream" )                     # Stream subtitle directory
@@ -183,6 +186,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
   def Search_Subtitles( self, gui = True ):
     self.subtitles_list = []
     self.session_id = ""
+
     if gui:
       self.getControl( SUBTITLES_LIST ).reset()
       self.getControl( LOADING_IMAGE ).setImage(
@@ -196,10 +200,10 @@ class GUI( xbmcgui.WindowXMLDialog ):
     self.Service = Service
     if gui:
       self.getControl( STATUS_LABEL ).setLabel( _( 646 ))
+
     msg = ""
     socket.setdefaulttimeout(float(__addon__.getSetting( "timeout" )))
     try:
-      print 'Searching subtitles'
       self.subtitles_list, self.session_id, msg = self.Service.search_subtitles(
                                                        self.file_original_path,
                                                        self.title,
@@ -214,6 +218,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
                                                        self.language_3,
                                                        self.stack
                                                        )
+
+      print "SEARCH OK"
+      print self.subtitles_list
     except socket.error:
       errno, errstr = sys.exc_info()[:2]
       if errno == socket.timeout:
@@ -224,8 +231,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
       errno, errstr = sys.exc_info()[:2]
       msg = "Error: %s" % ( str(errstr), )
     socket.setdefaulttimeout(None)
-    if gui:
-      self.getControl( STATUS_LABEL ).setLabel( _( 642 ) % ( "...", ))
+    #if gui:
+    #  self.getControl( STATUS_LABEL ).setLabel( _( 642 ) % ( "...", ))
 
     if not self.subtitles_list:
       if __addon__.getSetting( "search_next" )== "true" and len(self.next) > 1:
@@ -539,6 +546,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
     if controlId == 150:
       if not self.focused:
         try:
+          print self.service
+          print 'Service listing here'
           select_index = self.service_list.index(self.service)
         except IndexError:
           select_index = 0

@@ -1059,6 +1059,11 @@ def get_categories(id, page):
 
 @plugin.route('/get_videos/<id>/<thumbnail>/<trailer>/<parent_id>/<series_name>')
 def get_videos(id, thumbnail, trailer, parent_id, series_name):
+
+    #xbmc.executebuiltin('XBMC.RunScript(special://home\\addons\\plugin.video.mvl\\script_subtitles.py)')
+    #hide_busy_dialog()
+    #exit()
+
     if check_internet():
         show_notification()
 
