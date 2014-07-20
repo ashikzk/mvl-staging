@@ -96,7 +96,7 @@ usrsettings = xbmcaddon.Addon(id=common.plugin_id)
 # authentication['logged_in'] = 'false'
 #username = usrsettings.getSetting('username_xbmc')
 #activation_key = usrsettings.getSetting('activationkey_xbmc')
-page_limit = 30
+page_limit = 100
 username = ''
 activation_key = ''
 usrsettings.setSetting(id='mac_address', value=usrsettings.getSetting('mac_address'))
@@ -149,7 +149,8 @@ def index():
     # copy pre-cached db
     src_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources', 'data', 'video_cache.db')
     dest_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'userdata', 'addon_data', 'script.module.metahandler', 'meta_cache', 'video_cache.db')
-    shutil.copyfile(src_path, dest_path)
+    if not os.path.exists(dest_path) or (os.path.exists(dest_path) and os.path.getsize(dest_path) < os.path.getsize(src_path)):
+        shutil.copyfile(src_path, dest_path)
 
     #clear Current Section name saved in the skin
     xbmc.executebuiltin('Skin.SetString(CurrentSection,)')
@@ -542,7 +543,7 @@ def get_categories(id, page):
             main_category_check = False
             is_search_category = False
             top_level_parent = 0
-            page_limit_cat = 30
+            page_limit_cat = 100
 
             xbmcplugin.setContent(pluginhandle, 'Movies')
 
@@ -598,6 +599,9 @@ def get_categories(id, page):
 
                 item_count = len(jsonObj)
                 done_count = 0
+
+                if item_count == 101 and jsonObj[100]['id'] == -1:
+                    item_count = item_count - 1
 
                 dp = xbmcgui.DialogProgress()
                 dp_created = False
@@ -960,7 +964,7 @@ def get_categories(id, page):
                         dp_created = True
 
                     done_count = done_count + 1
-                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far")
 
                     if dp.iscanceled():
                         break
@@ -1769,7 +1773,7 @@ def search(category):
                             dp_created = True
                                   
                         done_count = done_count + 1
-                        dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                        dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far")
 
                         if dp.iscanceled():
                             break                                 
@@ -1887,6 +1891,9 @@ def get_azlist(key, page, category):
                 ###########
 
                 xbmcplugin.setContent(pluginhandle, 'Movies')
+
+                if item_count == 201 and jsonObj[200]['id'] == -1:
+                    item_count = item_count - 1
 
                 for results in jsonObj:
                     if results['id'] == -1:
@@ -2091,7 +2098,7 @@ def get_azlist(key, page, category):
                         dp_created = True
                                   
                     done_count = done_count + 1
-                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far")
 
                     if dp.iscanceled():
                         break
@@ -2207,7 +2214,7 @@ def mostpopular(page, category):
                     dp_created = True
                               
                 done_count = done_count + 1
-                dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far")
 
                 if dp.iscanceled():
                     break
@@ -2840,4 +2847,6 @@ if __name__ == '__main__':
         #do not update path in case of mark_as_watched/unwatched was selected
         path = xbmc.getInfoLabel('Container.FolderPath')
         file_write('screen_path.dat', path)
+
+
 
