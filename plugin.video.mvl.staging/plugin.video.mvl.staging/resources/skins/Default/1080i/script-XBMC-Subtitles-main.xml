@@ -10,36 +10,36 @@
     <control type="group" id="250">
       <posx>-230</posx>
       <control type="image" description="BG">
-        <posx>290</posx>
-        <posy>75</posy>
-        <width>1800</width>
-        <height>880</height>
+        <posx>490</posx>
+        <posy>125</posy>
+        <width>1400</width>
+        <height>780</height>
         <texture border="24,21,24,24">dialogs/TinyDialog.png</texture>
       </control>
 
       <control type="image" description="BG">
-        <posx>1660</posx>
-        <posy>189</posy>
-        <width>390</width>
-        <height>726</height>
+        <posx>1500</posx>
+        <posy>235</posy>
+        <width>350</width>
+        <height>640</height>
         <texture border="9">img/WhiteRoundedT.png</texture>
       </control>
       <!-- ** Required ** Do not change <id>or<type>-->
       <control type="group">
-        <posx>300</posx>
-        <posy>111</posy>
+        <posx>500</posx>
+        <posy>160</posy>
         <control type="image" id="110">
           <description>Service Logo</description>
-          <posx>30</posx>
-          <posy>0</posy>
+          <posx>-30</posx>
+          <posy>-12</posy>
           <width>375</width>
           <height>60</height>
           <aspectratio>keep</aspectratio>
         </control>
         <control type="group" id="111">
           <control type="grouplist">
-            <posx>120</posx>
-            <posy>741</posy>
+            <posx>-100</posx>
+            <posy>641</posy>
             <width>1245</width>
             <height>60</height>
             <align>center</align>
@@ -59,7 +59,7 @@
         </control>
 
         <control type="label" id="100" description="Textarea">
-          <posx>75</posx>
+          <posx>-120</posx>
           <posy>90</posy>
           <width>1320</width>
           <height>60</height>
@@ -72,9 +72,9 @@
       </control>
       <!-- ** Required ** Do not change <id>or<type>-->
       <control type="list" id="120">
-        <posx>375</posx>
-        <posy>285</posy>
-        <width>1250</width>
+        <posx>525</posx>
+        <posy>310</posy>
+        <width>950</width>
         <height>538</height>
         <onleft>60</onleft>
         <onright>150</onright>
@@ -103,7 +103,7 @@
           <control type="label">
             <posx>54</posx>
             <posy>0</posy>
-            <width>135</width>
+            <width>250</width>
             <height>54</height>
             <font>ListDetails</font>
             <aligny>center</aligny>
@@ -179,7 +179,7 @@
           <control type="label">
             <posx>54</posx>
             <posy>0</posy>
-            <width>135</width>
+            <width>250</width>
             <height>54</height>
             <font>ListDetails</font>
             <aligny>center</aligny>
@@ -228,22 +228,22 @@
       </control>
       
       <control type="group" id="250">
-        <posx>-339</posx>
-        <posy>0</posy>
+        <posx>-100</posx>
+        <posy>35</posy>
         <control type="label" description="XBMC Subtitles label">
-          <posx>2000</posx>
+          <posx>1600</posx>
           <posy>220</posy>
-          <width>380</width>
+          <width>350</width>
           <height>30</height>
           <label>Available Languages</label>
           <font>ListDetails</font>
           <align>center</align>
         </control>
         <control type="list" id="150">
-          <posx>2000</posx>
+          <posx>1600</posx>
           <posy>285</posy>
-          <width>390</width>
-          <height>540</height>
+          <width>350</width>
+          <height>340</height>
           <onleft>120</onleft>
           <onright>120</onright>
           <onup>150</onup>
@@ -254,13 +254,13 @@
               <posx>0</posx>
               <posy>0</posy>
               <height>54</height>
-              <width>390</width>
+              <width>350</width>
               <texture border="3">buttons/ButtonNF.png</texture>
             </control>
             <control type="label">
-              <posx>10</posx>
+              <posx>20</posx>
               <posy>0</posy>
-              <width>360</width>
+              <width>320</width>
               <height>54</height>
               <font>ListDetails</font>
               <info>ListItem.Label</info>
@@ -269,7 +269,7 @@
             <control type="label">
               <posx>10</posx>
               <posy>0</posy>
-              <width>360</width>
+              <width>350</width>
               <height>54</height>
               <font>ListDetails</font>
               <info>ListItem.Label</info>
@@ -281,22 +281,22 @@
               <posx>0</posx>
               <posy>0</posy>
               <height>54</height>
-              <width>390</width>
+              <width>350</width>
               <texture border="3">buttons/ButtonNF.png</texture>
             </control>
             <control type="image">
               <posx>0</posx>
               <posy>0</posy>
               <height>54</height>
-              <width>390</width>
+              <width>350</width>
               <texture border="5">buttons/ButtonFO.png</texture>
               <visible>Control.HasFocus(150)</visible>
             </control>
             <control type="label">
-              <posx>10</posx>
+              <posx>20</posx>
               <posy>0</posy>
               <height>54</height>
-              <width>360</width>
+              <width>320</width>
               <font>ListDetails</font>
               <info>ListItem.Label</info>
               <visible>!ListItem.property(man)</visible>
@@ -305,7 +305,7 @@
               <posx>10</posx>
               <posy>0</posy>
               <height>54</height>
-              <width>360</width>
+              <width>350</width>
               <font>ListDetails</font>
               <info>ListItem.Label</info>
               <visible>ListItem.property(man)</visible>
@@ -313,21 +313,21 @@
           </focusedlayout>
         </control>
       </control>
-      <control type="scrollbar" id="60">
-        <posx>293</posx>
-        <posy>330</posy>
-        <width>36</width>
-        <height>500</height>
-        <texturesliderbackground>-</texturesliderbackground>
-        <texturesliderbar>-</texturesliderbar>
-        <texturesliderbarfocus>-</texturesliderbarfocus>
-        <textureslidernib border="18">OSD/ScrollbarNibNF.png</textureslidernib>
-        <textureslidernibfocus border="18">OSD/ScrollbarNibFO.png</textureslidernibfocus>
-        <showonepage>true</showonepage>
-        <orientation>vertical</orientation>
-        <onleft>noop</onleft>
-        <onright>120</onright>
-      </control>
+      <!--<control type="scrollbar" id="60">-->
+        <!--<posx>293</posx>-->
+        <!--<posy>330</posy>-->
+        <!--<width>36</width>-->
+        <!--<height>500</height>-->
+        <!--<texturesliderbackground>-</texturesliderbackground>-->
+        <!--<texturesliderbar>-</texturesliderbar>-->
+        <!--<texturesliderbarfocus>-</texturesliderbarfocus>-->
+        <!--<textureslidernib border="18">OSD/ScrollbarNibNF.png</textureslidernib>-->
+        <!--<textureslidernibfocus border="18">OSD/ScrollbarNibFO.png</textureslidernibfocus>-->
+        <!--<showonepage>true</showonepage>-->
+        <!--<orientation>vertical</orientation>-->
+        <!--<onleft>noop</onleft>-->
+        <!--<onright>120</onright>-->
+      <!--</control>-->
     </control>
   </controls>
 </window>

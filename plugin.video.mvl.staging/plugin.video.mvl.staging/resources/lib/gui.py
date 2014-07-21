@@ -194,7 +194,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
                                          os.path.join(
                                            SERVICE_DIR,
                                            self.service,
-                                           "logo.png")))
+                                           "mvl-logo.png")))
 
     exec ( "from services.%s import service as Service" % (self.service))
     self.Service = Service
@@ -219,8 +219,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
                                                        self.stack
                                                        )
 
-      print "SEARCH OK"
-      print self.subtitles_list
+      # print "SEARCH OK"
+      # print self.subtitles_list
     except socket.error:
       errno, errstr = sys.exc_info()[:2]
       if errno == socket.timeout:
@@ -258,6 +258,7 @@ class GUI( xbmcgui.WindowXMLDialog ):
       itemCount = 0
       list_subs = []
       mainLangISO = languageTranslate(self.language_1, 0, 3)
+      count = 0
       for item in self.subtitles_list:
         if (self.autoDownload and item["sync"] and
             languageTranslate(item["language_name"], 0, 3) == mainLangISO
@@ -270,8 +271,9 @@ class GUI( xbmcgui.WindowXMLDialog ):
           return True
         else:
           if gui:
+            count += 1
             listitem = xbmcgui.ListItem(label=_( languageTranslate(item["language_name"],0,5)),
-                                        label2=item["filename"],
+                                        label2='Source %i' % (count),#item["filename"],
                                         iconImage=item["rating"],
                                         thumbnailImage=item["language_flag"]
                                        )
@@ -291,7 +293,8 @@ class GUI( xbmcgui.WindowXMLDialog ):
         itemCount += 1
 
       if gui:
-        label = '%i %s '"' %s '"'' % (len ( self.subtitles_list ),_( 744 ),self.file_name)
+        # label = '%i %s '"' %s '"'' % (len ( self.subtitles_list ),_( 744 ),self.file_name)
+        label = ''"' %s '"' subtitles' % (self.file_name)
         self.getControl( STATUS_LABEL ).setLabel( label )
         self.getControl( SUBTITLES_LIST ).addItems( list_subs )
         self.setFocusId( SUBTITLES_LIST )

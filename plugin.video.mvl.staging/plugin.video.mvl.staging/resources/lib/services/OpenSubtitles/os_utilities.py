@@ -26,6 +26,8 @@ class OSDBServer:
 
     if( len ( self.subtitles_list ) > 0 ):
       self.subtitles_list.sort(key=lambda x: [not x['sync'],x['lang_index']])
+      if len ( self.subtitles_list ) > 5:
+        self.subtitles_list = self.subtitles_list[:5]
 
   def searchsubtitles( self, srch_string , lang1,lang2,lang3,hash_search, _hash = "000000000", size = "000000000"):
     msg                      = ""
