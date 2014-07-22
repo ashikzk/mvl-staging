@@ -96,7 +96,7 @@ usrsettings = xbmcaddon.Addon(id=common.plugin_id)
 # authentication['logged_in'] = 'false'
 #username = usrsettings.getSetting('username_xbmc')
 #activation_key = usrsettings.getSetting('activationkey_xbmc')
-page_limit = 30
+page_limit = 100
 username = ''
 activation_key = ''
 usrsettings.setSetting(id='mac_address', value=usrsettings.getSetting('mac_address'))
@@ -543,7 +543,7 @@ def get_categories(id, page):
             main_category_check = False
             is_search_category = False
             top_level_parent = 0
-            page_limit_cat = 30
+            page_limit_cat = 100
 
             xbmcplugin.setContent(pluginhandle, 'Movies')
 
