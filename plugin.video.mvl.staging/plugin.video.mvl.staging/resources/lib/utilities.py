@@ -65,7 +65,7 @@ LANGUAGES      = (
     ("Norwegian"                  , "3",        "no",            "nor",                 "30",                    30230  ),
     ("Polish"                     , "26",       "pl",            "pol",                 "31",                    30232  ),
     ("Portuguese"                 , "32",       "pt",            "por",                 "32",                    30233  ),
-    ("PortugueseBrazil"           , "48",       "pb",            "pob",                 "33",                    30234  ),
+    ("Portuguese (Brazil)"           , "48",       "pb",            "pob",                 "33",                    30234  ),
     ("Romanian"                   , "13",       "ro",            "rum",                 "34",                    30235  ),
     ("Russian"                    , "27",       "ru",            "rus",                 "35",                    30236  ),
     ("Serbian"                    , "36",       "sr",            "scc",                 "36",                    30237  ),
