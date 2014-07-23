@@ -961,7 +961,8 @@ def get_categories(id, page):
                         dp_created = True
 
                     done_count = done_count + 1
-                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                    #dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                    dp.update((done_count*100/item_count), str(done_count*100/item_count)+"%")
 
                     if dp.iscanceled():
                         break
@@ -1771,7 +1772,7 @@ def search(category):
                             dp_created = True
                                   
                         done_count = done_count + 1
-                        dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                        dp.update((done_count*100/item_count), str(done_count*100/item_count)+"%")
 
                         if dp.iscanceled():
                             break                                 
@@ -2093,7 +2094,7 @@ def get_azlist(key, page, category):
                         dp_created = True
                                   
                     done_count = done_count + 1
-                    dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                    dp.update((done_count*100/item_count), str(done_count*100/item_count)+"%")
 
                     if dp.iscanceled():
                         break
@@ -2209,7 +2210,7 @@ def mostpopular(page, category):
                     dp_created = True
                               
                 done_count = done_count + 1
-                dp.update((done_count*100/item_count), str(done_count)+" of "+str(item_count)+" "+dp_type+"s loaded so far.")
+                dp.update((done_count*100/item_count), str(done_count*100/item_count)+"%")
 
                 if dp.iscanceled():
                     break
