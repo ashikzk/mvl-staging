@@ -926,7 +926,7 @@ def get_categories(id, page):
                                           'Writer': categories['writer'],
                                           'plot': mvl_plot,
                                           'genre': categories['sub_categories_names'],
-                                          'cast': categories['actors'].encode('utf-8'),
+                                          #'cast': categories['actors'].encode('utf-8'),
                                           'year': categories['release_date'],
                                           'premiered': categories['release_date'],
                                           'duration': mvl_meta['duration'],
@@ -1102,7 +1102,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                       }]
 
 
-            src_list = ['movreel', 'novamov', 'nowvideo', 'lemupload', 'gorillavid']
+            src_list = ['movreel', 'novamov', 'nowvideo', 'gorillavid']
+            #'lemupload',
             #'promptfile', 'mightyupload',
             #'hugefile', 'billionupload', '180upload',
             # 'firedrive', 'putlocker',
@@ -1736,7 +1737,7 @@ def search(category):
                                               'Writer': categories['writer'],
                                               'plot': mvl_plot,
                                               'genre': categories['sub_categories_names'],
-                                              'cast': categories['actors'].encode('utf-8'),
+                                              #'cast': categories['actors'].encode('utf-8'),
                                               'year': categories['release_date'],
                                               'premiered': categories['release_date'],
                                               'duration': mvl_meta['duration'],
@@ -2059,7 +2060,7 @@ def get_azlist(key, page, category):
                                           'Writer': results['writer'],
                                           'plot': mvl_plot,
                                           'genre': results['sub_categories_names'],
-                                          'cast': results['actors'].encode('utf-8'),
+                                          #'cast': results['actors'].encode('utf-8'),
                                           'year': results['release_date'],
                                           'premiered': results['release_date'],
                                           'duration': mvl_meta['duration']
