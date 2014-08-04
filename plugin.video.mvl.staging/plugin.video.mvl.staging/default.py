@@ -1390,8 +1390,9 @@ def play_video(url, resolved_url, title, video_type, meta):
                                         season='', episode='', year=meta['year'], watch_percent=0.9,
                                         watchedCallbackwithParams=WatchedCallbackwithParams)
             else:
-                player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='episode', title=meta['title'], imdb_id =meta['imdb_id'],
-                                        season=meta['season'], episode=meta['episode'], year='', watch_percent=0.001,
+                player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='episode', title=meta['title'],
+                                        season=meta['season'], episode=meta['episode'],
+                                        year='', imdb_id=meta['imdb_id'], watch_percent=0.9,
                                         watchedCallbackwithParams=WatchedCallbackwithParams)
 
             #try:
@@ -1413,7 +1414,6 @@ def play_video(url, resolved_url, title, video_type, meta):
             unplayable = True
     except Exception, e:
         unplayable = True
-        #print 'KISU EKTA HOISE'
         print e
 
     if unplayable:
