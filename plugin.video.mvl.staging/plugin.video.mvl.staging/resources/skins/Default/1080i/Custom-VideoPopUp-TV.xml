@@ -66,8 +66,8 @@
           <width>660</width>
           <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_playnow.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_playnow_ON.png</texturefocus>
+          <texturenofocus>popup/btn_playnow.png</texturenofocus>
+          <texturefocus>popup/btn_playnow_ON.png</texturefocus>
         </control>
 
         <control type="button" id="15" description="WatchPreviews">
@@ -75,8 +75,8 @@
             <!--<label>Watch Previews</label>-->
             <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_watchpreview.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_watchpreview_ON.png</texturefocus>
+          <texturenofocus>popup/btn_watchpreview.png</texturenofocus>
+          <texturefocus>popup/btn_watchpreview_ON.png</texturefocus>
         </control>
 
         <control type="button" id="16" description="ReadReviews">
@@ -84,8 +84,8 @@
             <!--<label>Read Reviews</label>-->
             <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_readreviews.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_readreviews_ON.png</texturefocus>
+          <texturenofocus>popup/btn_readreviews.png</texturenofocus>
+          <texturefocus>popup/btn_readreviews_ON.png</texturefocus>
         </control>
 
         <control type="button" id="28" description="OfficialPosters">
@@ -93,8 +93,8 @@
             <!--<label>Posters & Images</label>-->
             <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_posterimages.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_posterimages_ON.png</texturefocus>
+          <texturenofocus>popup/btn_posterimages.png</texturenofocus>
+          <texturefocus>popup/btn_posterimages_ON.png</texturefocus>
         </control>
 
         <control type="button" id="18" description="PurchaseOptions">
@@ -102,8 +102,8 @@
             <!--<label>Purchase Options</label>-->
             <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_purchaseoptions.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_purchaseoptions_ON.png</texturefocus>
+          <texturenofocus>popup/btn_purchaseoptions.png</texturenofocus>
+          <texturefocus>popup/btn_purchaseoptions_ON.png</texturefocus>
         </control>
 
         <control type="button" id="23" description="Close">
@@ -112,8 +112,8 @@
           <textoffsetx>30</textoffsetx>
           <focusedcolor>FF4F9C45</focusedcolor>
           <textcolor>FF1F6C15</textcolor>
-          <texturenofocus colordiffuse="FFFFAAFF">popup/btn_exit.png</texturenofocus>
-          <texturefocus colordiffuse="FFFFAAFF">popup/btn_exit_ON.png</texturefocus>
+          <texturenofocus>popup/btn_exit.png</texturenofocus>
+          <texturefocus>popup/btn_exit_ON.png</texturefocus>
         </control>
 
         <control type="label" id="20">
