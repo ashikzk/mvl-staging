@@ -1119,6 +1119,9 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
 
                 if urls['resolved_URL'] == '':
                     urls['resolved_URL'] = 'NONE'
+                else:
+                    #put resolved url above all by making it's src_order set to -1
+                    urls['src_order'] = -1
 
             jsonObj.sort(key=lambda x: x['src_order'])
 
