@@ -1062,10 +1062,6 @@ def get_categories(id, page):
 @plugin.route('/get_videos/<id>/<thumbnail>/<trailer>/<parent_id>/<series_name>')
 def get_videos(id, thumbnail, trailer, parent_id, series_name):
 
-    #xbmc.executebuiltin('XBMC.RunScript(special://home\\addons\\plugin.video.mvl\\script_subtitles.py)')
-    #hide_busy_dialog()
-    #exit()
-
     if check_internet():
         show_notification()
 
@@ -1079,8 +1075,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             content = f.read()
             jsonObj = json.loads(content)
 
-            plugin.log.info(url)
-
+            #plugin.log.info(url)
 
             url = server_url + "/api/index.php/api/categories_api/getVideoTitle?video_id={0}".format(id)
             req = urllib2.Request(url)
@@ -1088,7 +1083,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             f = opener.open(req)
             content = f.read()
             items = []
-            plugin.log.info(jsonObj)
+            #plugin.log.info(jsonObj)
 
             # instruction text
             items += [{
@@ -1166,8 +1161,9 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                 #     continue
                 if urls['URL'].find('billionupload') >= 0 or urls['URL'].find('180upload') >= 0 or \
                         urls['URL'].find('hugefile') >= 0 or urls['URL'].find('megafiles') >= 0 or \
-                            urls['URL'].find('pandapla') >= 0 or urls['URL'].find('vidhog') >= 0:
-                    #discard these 3 source for hd
+                            urls['URL'].find('pandapla') >= 0 or urls['URL'].find('vidhog') >= 0 or \
+                                urls['URL'].find('') >= 0 or urls['URL'].find('') >= 0:
+                    #discard all these sources for hd
                     continue
 
                 source_quality = ''
@@ -1383,7 +1379,6 @@ def play_video(url, resolved_url, title, video_type, meta):
 #            else:
 #            #     mvl_meta = create_meta('movie', title, '', '')
 #                mvl_meta = {'year': ''}
-
 ######################
 
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
@@ -1403,11 +1398,7 @@ def play_video(url, resolved_url, title, video_type, meta):
                                         year='', imdb_id=meta['imdb_id'], watch_percent=0.9,
                                         watchedCallbackwithParams=WatchedCallbackwithParams)
 
-            #try:
             player.play(playlist)
-            #except:
-            #    print "MURI MURI"
-
 
             while player._playbackLock.isSet():
                 #print('- - -' +'Playback lock set. Sleeping for 250.')
