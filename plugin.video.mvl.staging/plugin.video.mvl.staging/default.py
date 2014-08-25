@@ -1226,19 +1226,16 @@ def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_na
 
 		mvl_meta = create_meta('tvshow', series_name.encode('utf-8'), '', '')
 		series_id = mvl_meta['tvdb_id']
-		print title
-		print mvl_meta
 
 		episode_title = title[title.find(' ')+1:]
 		season_text = title[0:title.find(' ')]
 		season = season_text[0:season_text.find('x')]
 		episode_num = season_text[season_text.find('x')+1:]
 		mvl_meta = __metaget__.get_episode_meta(episode_title, mvl_meta['imdb_id'], season, episode_num)
-		print mvl_meta
 
 	else:
 		mvl_meta = create_meta('movie', title, '', '')
-		series_id = mvl_meta['tmdb_id']
+		# series_id = mvl_meta['tmdb_id']
 
 
 	video_popup.setParams(trailer, url, resolved_url, video_title, video_id, series_id, mvl_meta)
@@ -1393,7 +1390,6 @@ def play_video(url, resolved_url, title, video_type, meta):
 			listitem = xbmcgui.ListItem(item_title)
 			playlist.add(url=hostedurl, listitem=listitem)
 
-
 			if video_type == 'movie':
 				player = playbackengine.Player(addon_id='plugin.video.mvl', video_type='movie', title=title,
 										season='', episode='', year=meta['year'], watch_percent=0.9,
@@ -1420,7 +1416,7 @@ def play_video(url, resolved_url, title, video_type, meta):
 			unplayable = True
 	except Exception, e:
 		unplayable = True
-		print 'EIKHANE ASI'
+		# print 'EIKHANE ASI'
 		print e
 
 	if unplayable:
@@ -1441,7 +1437,6 @@ def play_video(url, resolved_url, title, video_type, meta):
 	#	  hide_busy_dialog()
 
 def create_meta(video_type, title, year, thumb, sub_cat=None):
-	print video_type
 	try:
 		year = int(year)
 	except:
@@ -2373,7 +2368,7 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
 		self.series_id = series_id
 		self.meta = mvl_meta
 
-		if trailer_id == 'NONE':
+		if trailer_id == 'NONE' and series_id != 'NONE':
 			self.video_type = 'episode'
 		else:
 			self.video_type = 'movie'
