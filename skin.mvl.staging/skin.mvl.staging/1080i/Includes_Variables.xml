@@ -1,6 +1,7 @@
 <includes>
   <variable name="Time" description="Date and time">
-    <value condition="Window.IsActive(home) | Window.IsActive(weather)">[COLOR=Grey2]$INFO[System.Date][/COLOR][COLOR=Orange]  •  [/COLOR]$INFO[System.Time]</value>
+    <!-- <value condition="Window.IsActive(home) | Window.IsActive(weather)">[COLOR=Grey2]$INFO[System.Date][/COLOR][COLOR=Orange]  •  [/COLOR]$INFO[System.Time]</value> -->
+    <value>[COLOR=Orange]  •  [/COLOR][COLOR=Grey2]$INFO[System.Date][/COLOR][COLOR=Orange]  •  [/COLOR]$INFO[System.Time]</value>
     <value>$INFO[System.Time]</value>
   </variable>
   <variable name="Overlay" description="Overlay image">
