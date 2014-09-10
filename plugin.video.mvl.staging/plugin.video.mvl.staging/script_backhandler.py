@@ -1,5 +1,6 @@
 import os
 import time
+import resources.config as config
 
 try:
     #read screen_lock files content
@@ -12,12 +13,18 @@ try:
         #if screen_lock doesn't have any content, that means we are good to go
         path = xbmc.getInfoLabel('Container.FolderPath')
         # print "PATH (OLD)  = " + path
+        if path == 'plugin://'+config.plugin_id+'/':
+            #this has to be the first screen of plugin
+            #take user to Home directly
+            xbmc.executebuiltin("ActivateWindow(home)")
+        else:
+            xbmc.executebuiltin( "Action(back)" )
 
-        xbmc.executebuiltin( "Action(back)" )
-        time.sleep(0.2)
+        time.sleep(0.3)
 
         path_new = xbmc.getInfoLabel('Container.FolderPath')
         # print "PATH (NEW) = " + path_new
+
 
         #save new path and set it as current location path
         file_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'screen_path.dat')

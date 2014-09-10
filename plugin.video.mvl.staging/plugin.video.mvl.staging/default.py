@@ -207,6 +207,9 @@ def index():
 			file.write('<lookandfeel>\n')
 			file.write('<skin>'+common.skin_id+'</skin>\n')
 			file.write('</lookandfeel>\n')
+			file.write('<videoscreen>\n')
+			file.write('<screenmode>WINDOW</screenmode>\n')
+			file.write('</videoscreen>\n')
 			file.write('</advancedsettings>\n')
 			file.close()
 			

@@ -1,8 +1,12 @@
+##############################################
+
 
 
 def crawl_categories(id, page, az_key):
 
     try:
+        dp = xbmcgui.DialogProgress()
+        dp.create("Currently processing","","")
 
         parent_id = id
         main_category_check = False
@@ -13,8 +17,11 @@ def crawl_categories(id, page, az_key):
 
         if az_key is None:
             url = server_url + "/api/index.php/api/categories_api/getCategories?parent_id={0}&page={1}&limit={2}".format(id, page, page_limit_cat)
+            dp.update(100, "Currently processing: "+str(id)+" , page: "+str(page))
         else:
             url = server_url + "/api/index.php/api/categories_api/getAZList?key={0}&page={1}&category={2}&limit={3}".format(az_key, page, id, page_limit_az)
+            dp.update(100, "Currently processing: "+str(az_key)+" , page: "+str(page))
+
 
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
@@ -22,15 +29,21 @@ def crawl_categories(id, page, az_key):
         content = f.read()
         items = []
 
-        print url
+        # print url
 
         if content:
             jsonObj = json.loads(content)
             totalCats = len(jsonObj)
-            plugin.log.info('total categories-->%s' % totalCats)
+            # plugin.log.info('total categories-->%s' % totalCats)
             #plugin.log.info(jsonObj)
+            count = 0
 
             for categories in jsonObj:
+                count += 1
+                if az_key is None:
+                    dp.update(100, "Currently processing: "+str(id)+" , page: "+str(page)+" , item count: "+str(count))
+                else:
+                    dp.update(100, "Currently processing: "+str(az_key)+" , page: "+str(page)+" , item count: "+str(count))
 
                 #categories['id'] is -1 when more categories are present and next page option should be displayed
                 if categories['id'] == -1:
@@ -104,4 +117,5 @@ for az_key in az_keys:
     ret = crawl_categories(section_id, page_no, az_key)
 
 sys_exit()
+
 

@@ -21,9 +21,10 @@ from t0mm0.common.addon import Addon
 import xbmc
 import xbmcvfs
 import xbmcgui
+import config
 
-plugin_id = 'plugin.video.mvl.staging'
-skin_id = 'skin.mvl.staging'
+plugin_id = config.plugin_id
+skin_id = config.skin_id
 
 addon = Addon(plugin_id)
 addon_path = addon.get_path()
