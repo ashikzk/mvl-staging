@@ -1,7 +1,5 @@
 ##############################################
 
-
-
 def crawl_categories(id, page, az_key):
 
     try:
@@ -12,7 +10,7 @@ def crawl_categories(id, page, az_key):
         main_category_check = False
         is_search_category = False
         top_level_parent = 0
-        page_limit_cat = 30
+        page_limit_cat = 100
         page_limit_az = 200
 
         if az_key is None:
