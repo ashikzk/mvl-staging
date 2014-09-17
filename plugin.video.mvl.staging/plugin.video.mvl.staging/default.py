@@ -301,8 +301,8 @@ def index():
 		sys_exit()
 
 
-def setup_internet_check():
-	t = Thread(target=check_internet_connection)
+def setup_current_screen_check():
+	t = Thread(target=check_current_screen)
 	t.daemon = True
 	t.start()
 
@@ -316,37 +316,40 @@ def check_quit_log():
 
 
 # called by each thread
-def check_internet_connection():
-	sleep_time = 20
+def check_current_screen():
+	sleep_time = 5
 
+	total = 1
 	try:
 		while(True):
-			print 'Starting outbound call to test internet connection'
-			url = 'http://www.google.com'
-			response = urllib2.urlopen(url, timeout=1)
 			count = sleep_time
 			while count:
 				count = count - 1
 				time.sleep(1)
 
-				if check_quit_log():
-					return
+			path = xbmc.getInfoLabel('Container.FolderPath')
+			# showMessage('Thread Message', path)
+
+			if path == '':
+			    last_path = file_read('screen_path.dat')
+			    if last_path:
+			        xbmc.executebuiltin("ActivateWindow(home)")
+                    #reset path to home
+			        file_write('screen_path.dat', None)
+
+
+			total += 1
+			if total > 10:
+			    break
 
 	except Exception, e:
 		print e
 		# showMessage('No Connection', 'No internet connection can be found')
-		dialog_msg()
-		#now setup another thread to continue checking internet connection
-		count = sleep_time
-		while count:
-			count = count - 1
-			time.sleep(1)
+        setup_current_screen_check()
 
-			if check_quit_log():
-				return
+setup_current_screen_check()
 
-		setup_internet_check()
-
+###############################
 
 def show_notification():
 
@@ -2873,8 +2876,4 @@ if __name__ == '__main__':
 		#do not update path in case of mark_as_watched/unwatched was selected
 		path = xbmc.getInfoLabel('Container.FolderPath')
 		file_write('screen_path.dat', path)
-
-
-
-
 
