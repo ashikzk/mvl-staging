@@ -105,7 +105,7 @@ THEME_PATH = os.path.join(_MVL.get_path(), 'art')
 
 # server_url = 'http://staging.redbuffer.net/xbmc'
 # server_url = 'http://localhost/xbmc'
-server_url = 'http://config.myvideolibrary.com'
+server_url = 'http://config.myvideolibrary.com/staging_api'
 PREPARE_ZIP = False
 
 __metaget__ = metahandlers.MetaData(preparezip=PREPARE_ZIP)
@@ -836,7 +836,7 @@ def get_categories(id, page):
                         watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': '0'}
 
                         if categories['top_level_parent'] == '1':
-                            mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['release_date'], mvl_img)
+                            mvl_meta = create_meta('movie', categories['title'].encode('utf-8'), categories['year'], mvl_img, imdb_id=categories['imdb_id'])
                             watch_info['year'] = mvl_meta['year']
                         elif categories['top_level_parent'] == '3':
                             #playable items of TV show are episodes
@@ -1015,6 +1015,8 @@ def get_categories(id, page):
         except Exception, e:
             print 'Exception...'
             print e
+            import traceback
+            print traceback.print_exc()
 
             if id in ('1', '3'):  # if we were on 1st page, then the viewmode should remain to 58 as an error has occured and we haven't got any data for next screen
                 mvl_view_mode = 58
@@ -1074,15 +1076,23 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                           'replace_context_menu': True
                       }]
 
-
-            src_list = ['movreel', 'mightyupload', 'promptfile', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'gorillavid']
-            #, 'novamov', 'nowvideo', 'gorillavid']
-            #'lemupload',
-            #'promptfile', 'mightyupload',
-            #'hugefile', 'billionupload', '180upload',
-            # 'firedrive', 'putlocker',
+            src_list = ['movreel', 'billionupload', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'thefile', 'bestream', 'mightyupload', 'promptfile', 'gorillavid']
+            # ['movreel', 'mightyupload', 'promptfile', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'gorillavid']
 
             for urls in jsonObj:
+                if urls['resolved_URL'] == '':
+                    urls['resolved_URL'] = 'NONE'
+
+                if urls['view_count'] != '':
+                    urls['view_count'] = int(urls['view_count'])
+                else:
+                    urls['view_count'] = 0
+
+                if urls['verified'] != '':
+                    urls['verified'] = int(urls['verified'])
+                else:
+                    urls['verified'] = 0
+
                 src_order = 0
                 for src in src_list:
                     if urls['URL'].find(src) >= 0:
@@ -1090,28 +1100,30 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                     src_order += 1
 
                 urls['src_order'] = src_order
-
-                if urls['resolved_URL'] == '':
-                    urls['resolved_URL'] = 'NONE'
-                    if urls['src_order'] > 0 and urls['last_resolved'] != '0000-00-00 00:00:00':
-                        #'0000-00-00 00:00:00' means this is a new entry and hasn't been resolved yet
-                        #should get the benifit of doubt!
-                        urls['src_order'] = len(src_list)+1
-                    #all un-resolved urls will be marked as <len(src_list)+1>
-                    #except for the first src <movreel> which will be shown whenever possible
-                #elif:
-                    #put resolved url above all by making it's src_order set to -1
-                    #urls['src_order'] = len(src_list)
+                #
+                # if urls['resolved_URL'] == '':
+                #     urls['resolved_URL'] = 'NONE'
+                #     if urls['src_order'] > 0 and urls['last_resolved'] != '0000-00-00 00:00:00':
+                #         #'0000-00-00 00:00:00' means this is a new entry and hasn't been resolved yet
+                #         #should get the benifit of doubt!
+                #         urls['src_order'] = len(src_list)+1
+                #     #all un-resolved urls will be marked as <len(src_list)+1>
+                #     #except for the first src <movreel> which will be shown whenever possible
+                # #elif:
+                #     #put resolved url above all by making it's src_order set to -1
+                #     #urls['src_order'] = len(src_list)
 
             jsonObj.sort(key=lambda x: x['src_order'])
+            # jsonObj.sort(key=lambda x: x['view_count'], reverse=True)
+            # jsonObj.sort(key=lambda x: x['verified'], reverse=True)
 
             count = 0
             sd_count = 0
             for urls in jsonObj:
                 # if parent_id == '1' and urls['resolved_URL'] == 'NONE':
                 # if un-resolved and not in premium list, then continue
-                if urls['resolved_URL'] == 'NONE' and urls['src_order'] == len(src_list)+1:
-                    continue
+                # if urls['resolved_URL'] == 'NONE' and urls['src_order'] == len(src_list)+1:
+                #     continue
 
                 source_quality = ''
                 source_url = urls['URL'][urls['URL'].find('://')+3:]
@@ -1139,7 +1151,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             for urls in jsonObj:
                 # if urls['resolved_URL'] == 'NONE':
                 #	  continue
-                if urls['URL'].find('billionupload') >= 0 or urls['URL'].find('180upload') >= 0 or \
+                # urls['URL'].find('billionupload') >= 0 or
+                if urls['URL'].find('180upload') >= 0 or \
                         urls['URL'].find('hugefile') >= 0 or urls['URL'].find('megafiles') >= 0 or \
                             urls['URL'].find('pandapla') >= 0 or urls['URL'].find('vidhog') >= 0 or \
                                 urls['URL'].find('epicshare') >= 0 or urls['URL'].find('vidplay') >= 0:
@@ -1415,13 +1428,13 @@ def play_video(url, resolved_url, title, video_type, meta):
     #	  dialog_msg()
     #	  hide_busy_dialog()
 
-def create_meta(video_type, title, year, thumb, sub_cat=None):
+def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
     try:
         year = int(year)
     except:
         year = 0
     year = str(year)
-    meta = {'title': title, 'year': year, 'imdb_id': '', 'overlay': ''}
+    meta = {'title': title, 'year': year, 'imdb_id': '', 'overlay': '', 'duration': '', 'playcount': '' }
     try:
         if video_type == 'tvshow':
             meta = __metaget__.get_meta(video_type, title)
@@ -1429,7 +1442,7 @@ def create_meta(video_type, title, year, thumb, sub_cat=None):
                 meta = __metaget__.get_meta(video_type, title, year=year)
 
         elif video_type == 'movie':	 # movie
-            meta = __metaget__.get_meta(video_type, title, year=year)
+            meta = __metaget__.get_meta(video_type, title, year=year, imdb_id=imdb_id)
             alt_id = meta['tmdb_id']
 
         elif video_type == 'episode': # tv show episode
@@ -1673,7 +1686,7 @@ def search(category):
                             watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': '0'}
 
                             if categories['top_level_parent'] == '1':
-                                mvl_meta = create_meta('movie', categories['title'], categories['release_date'], mvl_img)
+                                mvl_meta = create_meta('movie', categories['title'], categories['year'], mvl_img, imdb_id=categories['imdb_id'])
                                 watch_info['year'] = mvl_meta['year']
                             elif categories['top_level_parent'] == '3':
                                 #playable items of TV show are episodes
@@ -1750,7 +1763,7 @@ def search(category):
                                                                'Mark as {0}'.format(watched_state),
                                                                'XBMC.RunPlugin(%s)' % plugin.url_for('mark_as_{0}'.format(watched_state.lower()),
                                                                                                  video_type=watch_info['video_type'],
-                                                                                                 title=categories['title'].encode('utf-8'),
+                                                                                                 title=categories['title'],
                                                                                                  imdb_id=mvl_meta['imdb_id'],
                                                                                                  year=watch_info['year'],
                                                                                                  season=watch_info['season'],
@@ -1998,7 +2011,7 @@ def get_azlist(key, page, category):
                         watch_info = {'video_type': 'movie', 'season': 'NONE', 'episode': 'NONE', 'year': ''}
 
                         if results['top_level_parent'] == '1':
-                            mvl_meta = create_meta('movie', results['title'], results['release_date'], mvl_img)
+                            mvl_meta = create_meta('movie', results['title'], results['year'], mvl_img, imdb_id=results['imdb_id'])
                             watch_info['year'] = mvl_meta['year']
                         elif results['top_level_parent'] == '3':
                             #playable items of TV show are episodes

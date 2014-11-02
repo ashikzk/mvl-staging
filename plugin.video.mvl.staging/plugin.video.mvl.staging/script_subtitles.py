@@ -4,8 +4,9 @@ import os
 import sys
 import xbmc
 import xbmcaddon
+import resources.config as config
 
-plugin_id = 'plugin.video.mvl.staging'
+plugin_id = config.plugin_id
 
 class DummyAddon:
   def __init__(self):
