@@ -24,7 +24,7 @@
         <posx>424</posx>
         <posy>150</posy>
         <width>1070</width>
-        <height>680</height>
+        <height>790</height>
         <font>InfoPlot</font>
         <align>justify</align>
       </control>
@@ -43,27 +43,6 @@
         <onleft>10</onleft>
         <onright>11</onright>
       </control>
-
-
-      <control type="radiobutton" id="9">
-          <description>Selection for T&C screen visibility</description>
-          <type>radiobutton</type>
-          <posx>410</posx>
-          <posy>850</posy>
-          <width>1080</width>
-          <height>80</height>
-          <visible>true</visible>
-          <label>Do not show this again</label>
-          <font>InfoPlot</font>
-          <textcolor>FFBBBBBB</textcolor>
-          <align>left</align>
-          <textoffsetx>90</textoffsetx>
-          <pulseonselect>true</pulseonselect>
-          <radioposx>1</radioposx>
-          <texturenofocus></texturenofocus>
-          <texturefocus></texturefocus>
-      </control>
-
       <control type="button" id="10" description="Disagree">
         <visible></visible>
         <posx>700</posx>

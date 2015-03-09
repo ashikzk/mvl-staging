@@ -1352,10 +1352,17 @@ def play_video(url, resolved_url, title, video_type, meta):
             #we have to resolve this url on client side cause it isn't pre-resolved or youtube url
             #first import urlresolver
             #as this takes a while, we'll be importing it only when required
-            import urlresolver
-            print 'Resolving....'
+            # import urlresolver
+            # print 'Resolving....'
+            # plugin.log.info(url)
+            # hostedurl = urlresolver.HostedMediaFile(url).resolve()
+            # plugin.log.info(hostedurl)
+            # print "okay...got it...done."
+            # exit()'
+
+            from resources import commonresolvers
             plugin.log.info(url)
-            hostedurl = urlresolver.HostedMediaFile(url).resolve()
+            hostedurl = commonresolvers.get(url)
             plugin.log.info(hostedurl)
 
         if str(hostedurl)[0] == 'h':# or str(hostedurl)[0] == 'p':
