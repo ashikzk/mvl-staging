@@ -1053,14 +1053,14 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
         global mvl_view_mode
         mvl_view_mode = 50
         try:
-            url = server_url + "/api/index.php/api/categories_api/getVideoUrls?video_id={0}".format(id)
+            url = server_url + "/api/index.php/api/categories_api/getVideoUrls?staging=1&video_id={0}".format(id)
+            plugin.log.info(url)
+
             req = urllib2.Request(url)
             opener = urllib2.build_opener()
             f = opener.open(req)
             content = f.read()
             jsonObj = json.loads(content)
-
-            #plugin.log.info(url)
 
             url = server_url + "/api/index.php/api/categories_api/getVideoTitle?video_id={0}".format(id)
             req = urllib2.Request(url)
@@ -1146,7 +1146,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                         items += [{
                                       'label': '{0} [COLOR FF235B9E]Source {1}[/COLOR] [COLOR {2}]{3}[/COLOR]'.format(content, count, source_color, source_quality),
                                       'thumbnail': thumbnail,
-                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
+                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name, source_id=urls['id']),
                                       'is_playable': False,
                                       'context_menu': [('','',)],
                                       'replace_context_menu': True
@@ -1180,7 +1180,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                         items += [{
                                       'label': '{0} [COLOR FF235B9E]Source {1}[/COLOR] [COLOR {2}]{3}[/COLOR]'.format(content, count, source_color, source_quality),
                                       'thumbnail': thumbnail,
-                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name),
+                                      'path': plugin.url_for('show_popup', url=urls['URL'], resolved_url=urls['resolved_URL'], title='{0}'.format(content), trailer=trailer, parent_id=parent_id, video_id=id, series_name=series_name, source_id=urls['id']),
                                       'is_playable': False,
                                       'context_menu': [('','',)],
                                       'replace_context_menu': True
@@ -1200,8 +1200,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
 
 video_popup = None
 
-@plugin.route('/show_popup/<url>/<resolved_url>/<title>/<trailer>/<parent_id>/<video_id>/<series_name>')
-def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_name):
+@plugin.route('/show_popup/<url>/<resolved_url>/<title>/<trailer>/<parent_id>/<video_id>/<series_name>/<source_id>')
+def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_name, source_id):
     global video_popup
 
     if parent_id == '1':
@@ -1228,7 +1228,7 @@ def show_popup(url, resolved_url, title, trailer, parent_id, video_id, series_na
         # series_id = mvl_meta['tmdb_id']
 
 
-    video_popup.setParams(trailer, url, resolved_url, video_title, video_id, series_id, mvl_meta)
+    video_popup.setParams(trailer, url, resolved_url, video_title, video_id, series_id, mvl_meta, source_id)
     video_popup.updateLabels()
 
     try:
@@ -1329,7 +1329,7 @@ def WatchedCallbackwithParams(video_type, title, imdb_id, season, episode, year)
         __metaget__.change_watched(video_type, title, imdb_id, season=season, episode=episode, year=year, watched=7)
 
 
-def play_video(url, resolved_url, title, video_type, meta):
+def play_video(url, resolved_url, title, video_type, meta, source_id):
     global mvl_view_mode
 
     mvl_view_mode = 50
@@ -1418,15 +1418,25 @@ def play_video(url, resolved_url, title, video_type, meta):
             unplayable = True
     except Exception, e:
         unplayable = True
-        # print 'EIKHANE ASI'
         print e
 
     if unplayable:
         #video not playable
-        #show error message
+        #now save the info about this failed attempt in the server using pur api
+        url = server_url + "/api/index.php/api/source_quality_api/setFailedAttempt?source_id={0}".format(source_id)
+        req = urllib2.Request(url)
+        opener = urllib2.build_opener()
+        f = opener.open(req)
+        content = f.read()
+        print 'Saved failed video playback report'
+        #save done
+
+        # show error message
         mvl_view_mode = 50
         hide_busy_dialog()
         showMessage('Error loading video', 'This source will not play. Please pick another.')
+
+        # show popup window
         resume_popup_window()
         return None
 
@@ -2368,7 +2378,7 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
     def __init__(self, xmlFilename, scriptPath, defaultSkin = "Default", defaultRes = "1080i"):
         pass
 
-    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id, mvl_meta):
+    def setParams(self, trailer_id, source_url, resolved_url, title, video_id, series_id, mvl_meta, source_id):
         self.trailer_id = trailer_id
         self.trailer_url = 'http://www.youtube.com/watch?v='+trailer_id
         self.source_url = source_url
@@ -2377,6 +2387,7 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
         self.video_id = video_id
         self.series_id = series_id
         self.meta = mvl_meta
+        self.source_id = source_id
 
         if trailer_id == 'NONE' and series_id != 'NONE':
             self.video_type = 'episode'
@@ -2401,12 +2412,12 @@ class CustomPopup(xbmcgui.WindowXMLDialog):
                 showMessage('Error', 'No trailer found')
                 resume_popup_window()
             else:
-                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type, self.meta)
+                play_video(self.trailer_url, 'NONE', self.title + ' - Official trailer', self.video_type, self.meta, self.source_id)
 
 
         elif control == 22:
             self.close()
-            play_video(self.source_url, self.resolved_url, self.title, self.video_type, self.meta)
+            play_video(self.source_url, self.resolved_url, self.title, self.video_type, self.meta, self.source_id)
 
         elif control == 23:
             #exit
