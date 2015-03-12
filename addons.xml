@@ -19,11 +19,9 @@
     </extension>
 </addon>
 
-<addon id="skin.mvl.staging" version="1.0.27" name="staging-mvlSkin" provider-name="Mukto Software Ltd.">
+<addon id="skin.mvl.staging" version="1.0.28" name="staging-mvlSkin" provider-name="Mukto Software Ltd.">
   <requires>
-    <import addon="xbmc.gui" version="4.0.0"/>
-    <import addon="script.favourites" version="3.2.0"/>
-	<!--import addon="service.skin.widgets" version="0.0.27"/-->
+    <import addon="xbmc.gui" version="5.0.1"/>
   </requires>
   <extension
     point="xbmc.gui.skin"
