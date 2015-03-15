@@ -391,8 +391,8 @@ def check_condition():
         heading = "Terms & Conditions"
         text = file_read('t&c.info')
 
-        print 'tc-text'
-        print text
+        # print 'tc-text'
+        # print text
 
         #dialog = xbmcgui.Dialog()
         #agree_ret = dialog.yesno(heading, text, yeslabel='Agree', nolabel='Disagree')
@@ -721,13 +721,13 @@ def get_categories(id, page):
                             is_season = False
                             if 'parent_title' in categories:
                                 #this must be a TV Show Season list
-                                mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), '', '')
+                                mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), categories['parent_year'], '')
                                 mvl_tvshow_title = categories['parent_title'].encode('utf-8')
                                 is_season = True
                                 #xbmcplugin.setContent(pluginhandle, 'Seasons')
 
                             else:
-                                mvl_meta = create_meta('tvshow', categories['title'].encode('utf-8'), '', '')
+                                mvl_meta = create_meta('tvshow', categories['title'].encode('utf-8'), categories['year'], '')
                                 mvl_tvshow_title = categories['title'].encode('utf-8')
 
                             dp_type = 'show'
@@ -1398,8 +1398,11 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
                                         watchedCallbackwithParams=WatchedCallbackwithParams)
 
 
-            player.play(playlist)
+            player_status = player.play(playlist)
             play_started = 0
+
+            # print "PLAYER STATUS 1"
+            # print player_status
 
             while player._playbackLock.isSet():
                 #print('- - -' +'Playback lock set. Sleeping for 250.')
@@ -1408,6 +1411,9 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
                 play_started += 1
                 if play_started == 20:
                     player.pause()
+
+            # print "PLAYER STATUS"
+            # print player_status
 
             #if we are here, it means playback has either stopped or finished
             #show popup again
@@ -1428,7 +1434,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
         opener = urllib2.build_opener()
         f = opener.open(req)
         content = f.read()
-        print 'Saved failed video playback report'
+        # print 'Saved failed video playback report'
         #save done
 
         # show error message
@@ -1453,6 +1459,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
 def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
     try:
         year = int(year)
+        year_int = year
     except:
         year = 0
     year = str(year)
@@ -1460,6 +1467,14 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
     try:
         if video_type == 'tvshow':
             meta = __metaget__.get_meta(video_type, title, year=year)
+
+            #if we get meta data where provided year doesn't match the meta year field
+            #we must have some wrong data in the cache. Clear earlier cache with only title only
+            # and try to get the data again using title and year
+            if 'year' in meta and meta['year'] != year_int:
+                __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
+                meta = __metaget__.get_meta(video_type, title, year=year)
+
             # if not (meta['imdb_id'] or meta['tvdb_id']):
             #     meta = __metaget__.get_meta(video_type, title, year=year)
 
@@ -1627,7 +1642,7 @@ def search(category):
                                 is_season = False
                                 if 'parent_title' in categories:
                                     #this must be a TV Show Season list
-                                    mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), '', '')
+                                    mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), categories['parent_year'], '')
                                     mvl_tvshow_title = categories['parent_title'].encode('utf-8')
                                     is_season = True
                                     #xbmcplugin.setContent(pluginhandle, 'Seasons')
@@ -1950,14 +1965,14 @@ def get_azlist(key, page, category):
                                 is_season = False
                                 if 'parent_title' in results:
                                     #this must be a TV Show Season list
-                                    mvl_meta = create_meta('tvshow', results['parent_title'].encode('utf-8'), '', '')
+                                    mvl_meta = create_meta('tvshow', results['parent_title'].encode('utf-8'), results['parent_year'], '')
                                     mvl_tvshow_title = results['parent_title'].encode('utf-8')
                                     is_season = True
                                     #xbmcplugin.setContent(pluginhandle, 'Seasons')
 
 
                                 else:
-                                    mvl_meta = create_meta('tvshow', results['title'].encode('utf-8'), '', '')
+                                    mvl_meta = create_meta('tvshow', results['title'].encode('utf-8'), results['year'], '')
                                     mvl_tvshow_title = results['title'].encode('utf-8')
 
                                 dp_type = 'show'
