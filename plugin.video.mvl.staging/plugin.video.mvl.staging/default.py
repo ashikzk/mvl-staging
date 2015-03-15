@@ -1459,9 +1459,9 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
     meta = {'title': title, 'year': year, 'imdb_id': '', 'overlay': '', 'duration': '', 'playcount': '' }
     try:
         if video_type == 'tvshow':
-            meta = __metaget__.get_meta(video_type, title)
-            if not (meta['imdb_id'] or meta['tvdb_id']):
-                meta = __metaget__.get_meta(video_type, title, year=year)
+            meta = __metaget__.get_meta(video_type, title, year=year)
+            # if not (meta['imdb_id'] or meta['tvdb_id']):
+            #     meta = __metaget__.get_meta(video_type, title, year=year)
 
         elif video_type == 'movie':	 # movie
             meta = __metaget__.get_meta(video_type, title, year=year, imdb_id=imdb_id)
@@ -1633,7 +1633,7 @@ def search(category):
                                     #xbmcplugin.setContent(pluginhandle, 'Seasons')
 
                                 else:
-                                    mvl_meta = create_meta('tvshow', categories['title'].encode('utf-8'), '', '')
+                                    mvl_meta = create_meta('tvshow', categories['title'].encode('utf-8'), categories['year'], '')
                                     mvl_tvshow_title = categories['title'].encode('utf-8')
 
                                 dp_type = 'show'
