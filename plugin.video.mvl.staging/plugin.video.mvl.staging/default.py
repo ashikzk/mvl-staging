@@ -33,7 +33,7 @@ if os.path.exists(file_path):
 else:
     last_path = ''
 
-if last_path == sys.argv[0]:
+if last_path == sys.argv[0] and 'show_popup' not in last_path :
     #same path requested again. no need to load. exit immediately
     #print "SAME PATH"
     xbmc.executebuiltin( "Dialog.Close(busydialog)" )
