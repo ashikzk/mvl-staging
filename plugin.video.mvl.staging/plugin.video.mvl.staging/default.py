@@ -1404,7 +1404,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
 
             # print "PLAYER STATUS 1"
             # print player_status
-            player.pause()
+            # player.pause()
 
             while player._playbackLock.isSet():
                 print('- - -' +'Playback lock set. Sleeping for 250.')
