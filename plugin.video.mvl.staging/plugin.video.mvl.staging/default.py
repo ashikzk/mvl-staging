@@ -358,7 +358,7 @@ def onClick_agree():
     # opener = urllib2.build_opener()
     # f = opener.open(req)
 
-    # file_write('term_agree.dat', 'true')
+    file_write('term_agree.dat', 'true')
 
     isAgree = True
 
@@ -1081,7 +1081,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                           'replace_context_menu': True
                       }]
 
-            src_list = ['movreel', 'billionupload', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'nowvideo', 'thefile', 'bestream', 'gorillavid']
+            src_list = ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'nowvideo', 'thefile', 'bestream', 'gorillavid']
             # ['movreel', 'mightyupload', 'promptfile', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'gorillavid']
 
             for urls in jsonObj:
@@ -1398,19 +1398,21 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
                                         watchedCallbackwithParams=WatchedCallbackwithParams)
 
 
-            player_status = player.play(playlist)
+            # player_status = player.play(playlist)
+            player.play(playlist)
             play_started = 0
 
             # print "PLAYER STATUS 1"
             # print player_status
+            player.pause()
 
             while player._playbackLock.isSet():
-                #print('- - -' +'Playback lock set. Sleeping for 250.')
+                print('- - -' +'Playback lock set. Sleeping for 250.')
                 xbmc.sleep(250)
 
-                play_started += 1
-                if play_started == 20:
-                    player.pause()
+                # play_started += 1
+                # if play_started == 20:
+                #     player.pause()
 
             # print "PLAYER STATUS"
             # print player_status
@@ -2375,6 +2377,8 @@ class CustomTermsPopup(xbmcgui.WindowXMLDialog):
         self.close()
 
     def onClick	(self, control):
+        print "CONTROL IS"
+        print control
         if control == 11:
             self.close()
             onClick_agree()
