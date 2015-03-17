@@ -1081,7 +1081,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                           'replace_context_menu': True
                       }]
 
-            src_list = ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'nowvideo', 'thefile', 'bestream', 'gorillavid']
+            src_list = ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'realvid', 'streamin', 'vidzi', 'vidbull', 'thefile', 'bestream', 'nowvideo', 'gorillavid']
+            # ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'nowvideo', 'thefile', 'bestream', 'gorillavid']
             # ['movreel', 'mightyupload', 'promptfile', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'gorillavid']
 
             for urls in jsonObj:
@@ -1333,14 +1334,8 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
     global mvl_view_mode
 
     mvl_view_mode = 50
-    #if login is successful then selected item will be resolved using urlresolver and played
-    # if login_check():
     unplayable = False
     try:
-        # if resolved_url != 'NONE':
-        #	  #no need to resolve the url on client side
-        #	  #use the pre-resolved url
-        #	  hostedurl = resolved_url
         if url.find('youtube.com') != -1:
             #this is youtube video
             #resolve ourselves
@@ -1349,17 +1344,6 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
             host, media_id = yt.get_host_and_id(url)
             hostedurl = yt.get_media_url(host, media_id)
         else:
-            #we have to resolve this url on client side cause it isn't pre-resolved or youtube url
-            #first import urlresolver
-            #as this takes a while, we'll be importing it only when required
-            # import urlresolver
-            # print 'Resolving....'
-            # plugin.log.info(url)
-            # hostedurl = urlresolver.HostedMediaFile(url).resolve()
-            # plugin.log.info(hostedurl)
-            # print "okay...got it...done."
-            # exit()'
-
             from resources import commonresolvers
             plugin.log.info(url)
             hostedurl = commonresolvers.get(url)
@@ -1371,15 +1355,6 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
                 source_url = source_url[source_url.find('www.')+4:]
 
             hide_busy_dialog()
-            #plugin.set_resolved_url(hostedurl)
-
-######################
-#			 if video_type == 'movie':
-#				 mvl_meta = create_meta('movie', title, '', '')
-#			 else:
-#			 #	   mvl_meta = create_meta('movie', title, '', '')
-#				 mvl_meta = {'year': ''}
-######################
 
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
             playlist.clear()
@@ -1436,7 +1411,6 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
         opener = urllib2.build_opener()
         f = opener.open(req)
         content = f.read()
-        # print 'Saved failed video playback report'
         #save done
 
         # show error message
@@ -1447,16 +1421,6 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
         # show popup window
         resume_popup_window()
         return None
-
-
-    # else: #login_check
-    #	  hide_busy_dialog()
-    #	  pass
-
-    # else: #check_internet
-    #	  mvl_view_mode = 50
-    #	  dialog_msg()
-    #	  hide_busy_dialog()
 
 def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
     try:
