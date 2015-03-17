@@ -1081,8 +1081,8 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                           'replace_context_menu': True
                       }]
 
-            src_list = ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'realvid', 'streamin', 'vidzi', 'vidbull', 'thefile', 'bestream', 'nowvideo', 'gorillavid']
-            # ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'nowvideo', 'thefile', 'bestream', 'gorillavid']
+            src_list = ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'thefile', 'bestream', 'nowvideo', 'gorillavid']
+            # ['movreel', 'firedrive', 'putlocker', 'mightyupload', 'promptfile', 'novamov', 'realvid', 'streamin', 'vidzi', 'vidbull', 'thefile', 'bestream', 'nowvideo', 'gorillavid']
             # ['movreel', 'mightyupload', 'promptfile', 'firedrive', 'putlocker', 'novamov', 'nowvideo', 'gorillavid']
 
             for urls in jsonObj:
