@@ -507,7 +507,8 @@ def get_categories(id, page):
 
     # showMessage('he he', str(mvl_view_mode))
 
-    mvl_view_mode = 58
+    # mvl_view_mode = 58
+    mvl_view_mode = 59
     # hide_busy_dialog()
     # return None
 
@@ -997,12 +998,12 @@ def get_categories(id, page):
             #we should set the view_mode as last thing in this method
             #because if user cancels his action and goes back before the api response
             #the view_mode will still be changed otherwise
-            if id in ('23', '32'): # if the Parent ID is Genres for TV or Movies then view should be set as "List" mode
-                mvl_view_mode = 50
-            elif id in ('1', '3'):	# if these are immediate childs of Top Level parents then view should be set as Fan Art
-                mvl_view_mode = 59
+            # if id in ('23', '32'): # if the Parent ID is Genres for TV or Movies then view should be set as "List" mode
+            #     mvl_view_mode = 50
+            # elif id in ('1', '3'):	# if these are immediate childs of Top Level parents then view should be set as Fan Art
+            #     mvl_view_mode = 59
             # else:
-                # mvl_view_mode = 59
+            #     mvl_view_mode = 59
 
             hide_busy_dialog()
 
@@ -1382,7 +1383,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
             # player.pause()
 
             while player._playbackLock.isSet():
-                print('- - -' +'Playback lock set. Sleeping for 250.')
+                # print('- - -' +'Playback lock set. Sleeping for 250.')
                 xbmc.sleep(250)
 
                 # play_started += 1
