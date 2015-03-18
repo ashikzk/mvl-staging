@@ -508,7 +508,7 @@ def get_categories(id, page):
     # showMessage('he he', str(mvl_view_mode))
 
     # mvl_view_mode = 58
-    mvl_view_mode = 59
+    mvl_view_mode = 51
     # hide_busy_dialog()
     # return None
 
@@ -673,26 +673,27 @@ def get_categories(id, page):
                     #add an extra item for the release month + year combo
                     if 'release_group' in categories:
                         if categories['release_group'] != last_release_group:
-                            if last_release_group == '':
-                                #that means this is the first line of list
-                                items += [{
-                                              'label': '[COLOR FFC41D67]Estimated Release Date[/COLOR]',
-                                              'path': plugin.url_for('do_nothing', view_mode=0),
-                                              'is_playable': False,
-                                              'context_menu': [('','',)],
-                                              'replace_context_menu': True
-                                          }]
+                            #skip adding realese_group
+                            # if last_release_group == '':
+                            #     #that means this is the first line of list
+                            #     items += [{
+                            #                   'label': '[COLOR FFC41D67]Estimated Release Date[/COLOR]',
+                            #                   'path': plugin.url_for('do_nothing', view_mode=0),
+                            #                   'is_playable': False,
+                            #                   'context_menu': [('','',)],
+                            #                   'replace_context_menu': True
+                            #               }]
 
 
                             last_release_group = categories['release_group']
 
-                            items += [{
-                                          'label': categories['release_group'],
-                                          'path': plugin.url_for('do_nothing', view_mode=0),
-                                          'is_playable': False,
-                                          'context_menu': [('','',)],
-                                          'replace_context_menu': True
-                                      }]
+                            # items += [{
+                            #               'label': categories['release_group'],
+                            #               'path': plugin.url_for('do_nothing', view_mode=0),
+                            #               'is_playable': False,
+                            #               'context_menu': [('','',)],
+                            #               'replace_context_menu': True
+                            #           }]
 
                     ####
 
@@ -1000,8 +1001,8 @@ def get_categories(id, page):
             #the view_mode will still be changed otherwise
             # if id in ('23', '32'): # if the Parent ID is Genres for TV or Movies then view should be set as "List" mode
             #     mvl_view_mode = 50
-            # elif id in ('1', '3'):	# if these are immediate childs of Top Level parents then view should be set as Fan Art
-            #     mvl_view_mode = 59
+            if id in ('1', '3'):	# if these are immediate childs of Top Level parents then view should be set as Fan Art
+                mvl_view_mode = 59
             # else:
             #     mvl_view_mode = 59
 
@@ -1013,7 +1014,6 @@ def get_categories(id, page):
                 xbmc.executebuiltin('Skin.SetString(CurrentSection,Movies)')
             elif id == '3':
                 xbmc.executebuiltin('Skin.SetString(CurrentSection,TV)')
-
 
             return items
         # except IOError:
@@ -1438,9 +1438,10 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
             #if we get meta data where provided year doesn't match the meta year field
             #we must have some wrong data in the cache. Clear earlier cache with only title only
             # and try to get the data again using title and year
-            if 'year' in meta and meta['year'] != year_int:
+            if 'year' in meta and meta['year'] != year_int :
                 __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
                 meta = __metaget__.get_meta(video_type, title, year=year)
+
 
             # if not (meta['imdb_id'] or meta['tvdb_id']):
             #     meta = __metaget__.get_meta(video_type, title, year=year)
