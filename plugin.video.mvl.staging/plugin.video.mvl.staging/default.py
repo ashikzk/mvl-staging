@@ -498,6 +498,12 @@ def do_nothing(view_mode):
 
     return None
 
+@plugin.route('/go_back/')
+def go_back():
+    hide_busy_dialog()
+    xbmc.executebuiltin( "Action(back)" )
+    return None
+
 
 @plugin.route('/categories/<id>/<page>')
 def get_categories(id, page):
@@ -723,7 +729,7 @@ def get_categories(id, page):
                             is_season = False
                             if 'parent_title' in categories:
                                 #this must be a TV Show Season list
-                                mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), categories['parent_year'], '')
+                                mvl_meta = create_meta('tvshow', categories['parent_title'].encode('utf-8'), categories['parent_year'], '', season=categories['title'].encode('utf-8'))
                                 mvl_tvshow_title = categories['parent_title'].encode('utf-8')
                                 is_season = True
                                 #xbmcplugin.setContent(pluginhandle, 'Seasons')
@@ -952,6 +958,16 @@ def get_categories(id, page):
                     if dp.iscanceled():
                         break
 
+
+                if main_category_check == False and int(page) > 0:
+                    items += [{
+                                  'label': '<< Back',
+                                  'path': plugin.url_for('go_back'),
+                                  'is_playable': False,
+                                  'thumbnail': art('back.png'),
+                                  'context_menu': [('','',)],
+                                  'replace_context_menu': True
+                              }]
 
 
                 if main_category_check == True:
@@ -1423,7 +1439,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
         resume_popup_window()
         return None
 
-def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
+def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id='', season=''):
     try:
         year = int(year)
         year_int = year
@@ -1442,9 +1458,29 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
                 __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
                 meta = __metaget__.get_meta(video_type, title, year=year)
 
+            #sometimes year tend to return no data where only title return proper poster. Lets try without year and only title
+            if meta['cover_url'] == '':
+                # __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
+                meta = __metaget__.get_meta(video_type, title)
+
+            #if still no poster, then try to remove the parenthesis part from the end of the title
+            # and search with that as last resort
+            if meta['cover_url'] == '':
+                title_mod = title[:title.find('(')-1]
+                # __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
+                meta = __metaget__.get_meta(video_type, title_mod)
+
+
+            #if it is season, then we need to get season poster
+            if season != '':
+                season_no = season[season.find(' ')+1:]
+                season_coverlist = __metaget__.get_seasons(title, '', [season_no])
+                season_cover_url = season_coverlist[0]['cover_url']
+                meta['cover_url'] = season_cover_url
 
             # if not (meta['imdb_id'] or meta['tvdb_id']):
             #     meta = __metaget__.get_meta(video_type, title, year=year)
+
 
         elif video_type == 'movie':	 # movie
             meta = __metaget__.get_meta(video_type, title, year=year, imdb_id=imdb_id)
@@ -1461,7 +1497,7 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id=''):
             meta = __metaget__.get_episode_meta(episode_title, meta_temp['imdb_id'], season, episode_num)
             meta['series_name'] = series_name
             #replace episode poster with series poster
-            meta['cover_url'] = meta_temp['cover_url']
+            # meta['cover_url'] = meta_temp['cover_url']
 
         #if video_type == 'tvshow':
         #	 meta['cover_url'] = meta['banner_url']
