@@ -8,6 +8,8 @@
         <include>Time</include>
       </control>
     </control>
+    <include>View_51_Panel</include>
+    
     <!-- LIST 50 -->
     <control type="group" description="50 MediaInfo">
       <visible>Control.IsVisible(50)</visible>
