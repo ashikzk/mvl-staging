@@ -501,7 +501,8 @@ def do_nothing(view_mode):
 @plugin.route('/go_back/')
 def go_back():
     hide_busy_dialog()
-    xbmc.executebuiltin( "Action(back)" )
+    # xbmc.executebuiltin( "Action(back)" )
+    xbmc.executebuiltin( "RunScript(special://home\\addons\\"+common.plugin_id+"\\script_backhandler.py)" )
     return None
 
 
@@ -642,13 +643,23 @@ def get_categories(id, page):
                         jsonObj.sort(key=lambda x: x['release_date'], reverse=True)
 
                     # print jsonObj
+                if jsonObj[0] and jsonObj[0]['top_level_parent'] != jsonObj[0]['parent_id'] and int(page) > 0:
+                    items += [{
+                                  'label': '<< Back',
+                                  'path': plugin.url_for('go_back'),
+                                  'is_playable': False,
+                                  'thumbnail': art('back.png'),
+                                  'context_menu': [('','',)],
+                                  'replace_context_menu': True
+                              }]
+
 
                 last_release_group = ''
 
                 for categories in jsonObj:
                     try:	# The last item of Json only contains the one element in array with key as "ID" so causing the issue
 
-                        plugin.log.info('{0}'.format(categories['is_playable']))
+                        # plugin.log.info('{0}'.format(categories['is_playable']))
                         if categories['top_level_parent'] == categories['parent_id']:
                             main_category_check = True
 
@@ -959,17 +970,6 @@ def get_categories(id, page):
                         break
 
 
-                if main_category_check == False and int(page) > 0:
-                    items += [{
-                                  'label': '<< Back',
-                                  'path': plugin.url_for('go_back'),
-                                  'is_playable': False,
-                                  'thumbnail': art('back.png'),
-                                  'context_menu': [('','',)],
-                                  'replace_context_menu': True
-                              }]
-
-
                 if main_category_check == True:
                     #adding A-Z listing option
                     if button_category == '1':
@@ -1019,6 +1019,9 @@ def get_categories(id, page):
             #     mvl_view_mode = 50
             if id in ('1', '3'):	# if these are immediate childs of Top Level parents then view should be set as Fan Art
                 mvl_view_mode = 59
+            elif id in ('23', '32'):
+                #set view mode to list view for showing genres
+                mvl_view_mode = 50
             # else:
             #     mvl_view_mode = 59
 
@@ -1466,9 +1469,10 @@ def create_meta(video_type, title, year, thumb, sub_cat=None, imdb_id='', season
             #if still no poster, then try to remove the parenthesis part from the end of the title
             # and search with that as last resort
             if meta['cover_url'] == '':
-                title_mod = title[:title.find('(')-1]
-                # __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
-                meta = __metaget__.get_meta(video_type, title_mod)
+                if title.find('(') > 0:
+                    title_mod = title[:title.find('(')-1]
+                    # __metaget__._cache_delete_video_meta(video_type, None, None, title, None)
+                    meta = __metaget__.get_meta(video_type, title_mod)
 
 
             #if it is season, then we need to get season poster
