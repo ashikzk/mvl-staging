@@ -1178,11 +1178,14 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
                 # if urls['resolved_URL'] == 'NONE':
                 #	  continue
                 # urls['URL'].find('billionupload') >= 0 or
-                if urls['URL'].find('180upload') >= 0 or \
-                        urls['URL'].find('hugefile') >= 0 or urls['URL'].find('megafiles') >= 0 or \
-                            urls['URL'].find('pandapla') >= 0 or urls['URL'].find('vidhog') >= 0 or \
-                                urls['URL'].find('epicshare') >= 0 or urls['URL'].find('vidplay') >= 0:
-                    #discard all these sources for hd
+                # if urls['URL'].find('180upload') >= 0 or \
+                        # urls['URL'].find('hugefile') >= 0 or urls['URL'].find('megafiles') >= 0 or \
+                            # urls['URL'].find('pandapla') >= 0 or urls['URL'].find('vidhog') >= 0 or \
+                                # urls['URL'].find('epicshare') >= 0 or urls['URL'].find('vidplay') >= 0:
+                    # #discard all these sources for hd
+                    # continue
+				#discard all non-movreel sources
+                if urls['URL'].find('movreel') == -1:
                     continue
 
                 source_quality = ''
