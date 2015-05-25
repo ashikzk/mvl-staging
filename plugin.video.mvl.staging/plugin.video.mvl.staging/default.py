@@ -271,7 +271,7 @@ def index():
 
             #creating a context menu
             #url used to get main categories from server
-            url = server_url + "/api/index.php/api/categories_api/getCategories?parent_id=0&limit={0}&page=1".format(page_limit)
+            url = server_url + "/api/index.php/staging_api/categories_api/getCategories?parent_id=0&limit={0}&page=1".format(page_limit)
             plugin.log.info(url)
             req = urllib2.Request(url)
             opener = urllib2.build_opener()
@@ -322,7 +322,7 @@ def check_quit_log():
 def show_notification():
 
     try:
-        url = server_url + "/api/index.php/api/notification_api/getNotification"
+        url = server_url + "/api/index.php/staging_api/notification_api/getNotification"
         plugin.log.info(url)
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
@@ -353,7 +353,7 @@ def onClick_agree():
     global isAgree
     # macAddress = usrsettings.getSetting('mac_address')
     # plugin.log.info("I Agree func calls")
-    # url = server_url + "/api/index.php/api/authentication_api/set_flag_status?username={0}&mac={1}".format(username, macAddress)
+    # url = server_url + "/api/index.php/staging_api/authentication_api/set_flag_status?username={0}&mac={1}".format(username, macAddress)
     # req = urllib2.Request(url)
     # opener = urllib2.build_opener()
     # f = opener.open(req)
@@ -373,7 +373,7 @@ def check_condition():
     # macAddress = usrsettings.getSetting('mac_address')
     # global curr_page
     # curr_page = 1
-    # url = server_url + "/api/index.php/api/authentication_api/get_flag_status?username={0}&mac={1}".format(username, macAddress)
+    # url = server_url + "/api/index.php/staging_api/authentication_api/get_flag_status?username={0}&mac={1}".format(username, macAddress)
     # req = urllib2.Request(url)
     # opener = urllib2.build_opener()
     # f = opener.open(req)
@@ -542,7 +542,7 @@ def get_categories(id, page):
             plugin.log.info(page)
             plugin.log.info(page_limit_cat)
 
-            url = server_url + "/api/index.php/api/categories_api/getCategories?parent_id={0}&page={1}&limit={2}".format(id,
+            url = server_url + "/api/index.php/staging_api/categories_api/getCategories?parent_id={0}&page={1}&limit={2}".format(id,
                                                                                                                          page,
                                                                                                                          page_limit_cat)
             plugin.log.info(url)
@@ -1073,7 +1073,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
         global mvl_view_mode
         mvl_view_mode = 50
         try:
-            url = server_url + "/api/index.php/api/categories_api/getVideoUrls?staging=1&video_id={0}".format(id)
+            url = server_url + "/api/index.php/staging_api/categories_api/getVideoUrls?staging=1&video_id={0}".format(id)
             plugin.log.info(url)
 
             req = urllib2.Request(url)
@@ -1082,7 +1082,7 @@ def get_videos(id, thumbnail, trailer, parent_id, series_name):
             content = f.read()
             jsonObj = json.loads(content)
 
-            url = server_url + "/api/index.php/api/categories_api/getVideoTitle?video_id={0}".format(id)
+            url = server_url + "/api/index.php/staging_api/categories_api/getVideoTitle?video_id={0}".format(id)
             req = urllib2.Request(url)
             opener = urllib2.build_opener()
             f = opener.open(req)
@@ -1285,7 +1285,7 @@ def show_review(video_id):
     video_popup.setParams('')
 
     try:
-        url = server_url + "/api/index.php/api/review_api/getReview?video_id={0}".format(video_id)
+        url = server_url + "/api/index.php/staging_api/review_api/getReview?video_id={0}".format(video_id)
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
         f = opener.open(req)
@@ -1429,7 +1429,7 @@ def play_video(url, resolved_url, title, video_type, meta, source_id):
     if unplayable:
         #video not playable
         #now save the info about this failed attempt in the server using pur api
-        url = server_url + "/api/index.php/api/source_quality_api/setFailedAttempt?source_id={0}".format(source_id)
+        url = server_url + "/api/index.php/staging_api/source_quality_api/setFailedAttempt?source_id={0}".format(source_id)
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
         f = opener.open(req)
@@ -1538,7 +1538,7 @@ def login_check():
     return True
 
     try:
-        url = server_url + "/api/index.php/api/authentication_api/authenticate_user"
+        url = server_url + "/api/index.php/staging_api/authentication_api/authenticate_user"
         #urlencode is used to create a json object which will be sent to server in POST
         data = urllib.urlencode({'username': '{0}'.format(username), 'activation_key': '{0}'.format(activation_key),
                                  'mac_address_flag': 'false',
@@ -1608,7 +1608,7 @@ def search(category):
                     hide_busy_dialog()
                     return None
 
-                url = server_url + "/api/index.php/api/categories_api/searchVideos"
+                url = server_url + "/api/index.php/staging_api/categories_api/searchVideos"
 
                 plugin.log.info(url)
                 data = urllib.urlencode({'keywords': '{0}'.format(search_string), 'category': '{0}'.format(category)})
@@ -1905,7 +1905,7 @@ def get_azlist(key, page, category):
 
             dp = xbmcgui.DialogProgress()
 
-            url = server_url + "/api/index.php/api/categories_api/getAZList?key={0}&limit={1}&page={2}&category={3}".format(key, page_limit_az, page, category)
+            url = server_url + "/api/index.php/staging_api/categories_api/getAZList?key={0}&limit={1}&page={2}&category={3}".format(key, page_limit_az, page, category)
             #plugin.log.info("here is the url")
             plugin.log.info(url)
             req = urllib2.Request(url)
@@ -2192,7 +2192,7 @@ def mostpopular(page, category):
 
         page_limit_mp = 30
 
-        url = server_url + "/api/index.php/api/categories_api/getMostPopular?limit={0}&page={1}&category={2}".format(page_limit_mp, page, category)
+        url = server_url + "/api/index.php/staging_api/categories_api/getMostPopular?limit={0}&page={1}&category={2}".format(page_limit_mp, page, category)
         plugin.log.info(url)
         req = urllib2.Request(url)
         opener = urllib2.build_opener()
@@ -2658,7 +2658,7 @@ class CustomKeyboard(xbmcgui.WindowXMLDialog):
         label = label.lower()
         control = 434
 
-        #r = requests.get('http://config.myvideolibrary.com/api/index.php/api/categories_api/getAZList?key=A&page=0&category=3&limit=5')
+        #r = requests.get('http://config.myvideolibrary.com/api/index.php/staging_api/categories_api/getAZList?key=A&page=0&category=3&limit=5')
         #print r.text
         sugg = self.words.iter(label)
         cnt = 0
